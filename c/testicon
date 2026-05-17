@@ -11,12 +11,19 @@
 #include "GContext/gcontext.h"
 #include "ploticon.h"
 #include "palette.h"
-
+#include "swis.h"
 
 void testicon(void)
 {
-    gcontext_t *gcontext = gcontext_initvdu(2);
+    gcontext_t *gcontext;
     Wimp_Icon icon;
+
+    // Select mode 28 (640x480, 256 colors)
+    _swi(OS_WriteC, _IN(0), 22);
+    _swi(OS_WriteC, _IN(0), 28);
+
+    gcontext = gcontext_initvdu(2);
+
 
     // Background
     gcontext->rectangle_fill(gcontext, palette_get_wimp_colour(1), 0, 0, 1280, 1024);
