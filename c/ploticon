@@ -6,9 +6,11 @@
 
 #include "ploticon.h"
 #include "iconborders.h"
-#include "sprite.h"
 #include "config.h"
 #include "validationcache.h"
+#include "wimpsprite.h"
+#include "swis.h"
+#include "riscos/Sprite.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +93,7 @@ static alignment_t get_sprite_alignment(uint32_t flags)
     return align;
 }
 
-static void get_icon_data(const Wimp_Icon *icon, const char **text, const char **validation, OSSpriteOp_Id *sprite_id, OSSpriteOp_Area **sprite_area)
+static void get_icon_data(const Wimp_Icon *icon, const char **text, const char **validation, void **sprite_id, void **sprite_area)
 {
     uint32_t flags = icon->flags;
     *text = NULL;
@@ -103,13 +105,13 @@ static void get_icon_data(const Wimp_Icon *icon, const char **text, const char *
     {
         if (flags & Wimp_IconText)
         {
-            *text = icon->data.indirected_text.text;
-            *validation = icon->data.indirected_text.validation;
+            *text = (const char *)icon->data.indirected_text.text;
+            *validation = (const char *)icon->data.indirected_text.validation;
         }
         else if (flags & Wimp_IconSprite)
         {
-            *sprite_id = icon->data.indirected_sprite.id;
-            *sprite_area = icon->data.indirected_sprite.area;
+            *sprite_id = (void *)icon->data.indirected_sprite.id;
+            *sprite_area = (void *)icon->data.indirected_sprite.area;
         }
     }
     else
@@ -120,17 +122,17 @@ static void get_icon_data(const Wimp_Icon *icon, const char **text, const char *
         }
         if (flags & Wimp_IconSprite)
         {
-            *sprite_id = (OSSpriteOp_Id)icon->data.sprite;
+            *sprite_id = (void *)icon->data.sprite;
         }
     }
 }
 
-void ploticon_render(gcontext_t *gcontext, textrender_t *trender, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
+void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t *graphics, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
 {
     const char *text_str;
     const char *validation_str;
-    OSSpriteOp_Id sprite_id;
-    OSSpriteOp_Area *sprite_area;
+    void *sprite_id;
+    void *sprite_area;
     validationcache_t *vc;
     int border_type;
     bool selected;
@@ -207,29 +209,92 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, const Wimp_Ico
         alignment_t align;
         int sx;
         int sy;
+        char sprite_name[13];
+        sprite_t *sprite_ptr = NULL;
+        bool has_sprite_name = false;
 
-        sprite_size(sprite_id, sprite_area, (icon->flags & Wimp_IconHalfSize) != 0, &sw, &sh);
-        align = get_sprite_alignment(icon->flags);
-        
-        sx = bounds.x0;
-        sy = bounds.y0;
+        if (icon->flags & Wimp_IconIndirected) {
+            if (icon->flags & Wimp_IconText) {
+                if (vc && vc->sprite_on_offset) {
+                    const char *s_name = validation_str + vc->sprite_on_offset;
+                    int i = 0;
+                    while (i < 12 && s_name[i] != ';' && s_name[i] != ',' && s_name[i] > 31) {
+                        sprite_name[i] = s_name[i];
+                        i++;
+                    }
+                    sprite_name[i] = '\0';
+                    has_sprite_name = true;
+                    // For validation string sprites, usually area is 1 (Wimp pool) or 0 (System)
+                    // Wimp typically searches both, but we'll try Wimp pool (1) here or pass 0.
+                    // For now, pass 0 to search system, then Wimp pool if needed. 
+                    // Actually, let's just pass (void*)1 as default.
+                    sprite_area = (void *)1;
+                }
+            } else {
+                strncpy(sprite_name, (const char *)sprite_id, 12);
+                sprite_name[12] = '\0';
+                has_sprite_name = true;
+            }
+        } else {
+            strncpy(sprite_name, (const char *)icon->data.sprite, 12);
+            sprite_name[12] = '\0';
+            has_sprite_name = true;
+        }
 
-        if (align.halign == 0) sx += (icon_width - sw) / 2;
-        else if (align.halign == 1) sx += (icon_width - sw);
-
-        if (align.valign == 0) sy += (icon_height - sh) / 2;
-        else if (align.valign == 1) sy += (icon_height - sh);
-
-        sprite_render(gcontext, sprite_id, sprite_area, sx, sy, 
-                      (icon->flags & Wimp_IconHalfSize) != 0, 
-                      selected, shaded, bg_colour);
-        
-        // Adjust bounds if text is also present and VCentred (to right of sprite)
-        if ((icon->flags & Wimp_IconText) && (icon->flags & Wimp_IconVCentred) && !(icon->flags & Wimp_IconHCentred))
+        if (has_sprite_name)
         {
-            bounds.x0 += sw + 12;
-            icon_width = bounds.x1 - bounds.x0;
-            icon_height = bounds.y1 - bounds.y0;
+            // Select sprite
+            _kernel_oserror *err = _swix(Wimp_SpriteOp, _INR(0, 2)|_OUT(2),
+                  0x100 + 24 /* SpriteReason_SelectSprite */,
+                  sprite_area ? sprite_area : (void *)0,
+                  sprite_name,
+                  &sprite_ptr);
+            // If failed to find in provided area, try Wimp pool if we haven't already
+            if (err && sprite_area == (void*)0) {
+                 _swix(Wimp_SpriteOp, _INR(0, 2)|_OUT(2),
+                  0x100 + 24 /* SpriteReason_SelectSprite */,
+                  (void *)1,
+                  sprite_name,
+                  &sprite_ptr);
+            }
+        }
+
+        if (sprite_ptr)
+        {
+            wimpsprite_t *wsprite = wimpsprite_create(graphics, sprite_ptr,
+                                                      (icon->flags & Wimp_IconHalfSize) != 0,
+                                                      false, // is_unscaled - typically validation 'X'
+                                                      selected, shaded,
+                                                      bg_colour, colours[COLOUR_BG]);
+            if (wsprite)
+            {
+                bounds_t s_bounds = wimpsprite_getsize(wsprite);
+                sw = s_bounds.width;
+                sh = s_bounds.height;
+
+                align = get_sprite_alignment(icon->flags);
+                
+                sx = bounds.x0;
+                sy = bounds.y0;
+
+                if (align.halign == 0) sx += (icon_width - sw) / 2;
+                else if (align.halign == 1) sx += (icon_width - sw);
+
+                if (align.valign == 0) sy += (icon_height - sh) / 2;
+                else if (align.valign == 1) sy += (icon_height - sh);
+
+                wimpsprite_render(wsprite, sx, sy, false);
+
+                free(wsprite);
+                
+                // Adjust bounds if text is also present and VCentred (to right of sprite)
+                if ((icon->flags & Wimp_IconText) && (icon->flags & Wimp_IconVCentred) && !(icon->flags & Wimp_IconHCentred))
+                {
+                    bounds.x0 += sw + 12;
+                    icon_width = bounds.x1 - bounds.x0;
+                    icon_height = bounds.y1 - bounds.y0;
+                }
+            }
         }
     }
 

@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef struct eigenfactors_s {
+    uint8_t xeig;
+    uint8_t yeig;
+} eigenfactors_t;
 
 /* Constants */
 

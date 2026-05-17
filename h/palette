@@ -10,6 +10,17 @@
 #include <stdint.h>
 #include "GContext/gcontext.h"
 
+typedef struct wimp_palette_s {
+    colour_t screen[16];
+    colour_t border;
+    colour_t pointer[3];
+} wimp_palette_t;
+
+extern wimp_palette_t default_wimp_palette;
+extern wimp_palette_t current_wimp_palette;
+
+void palette_init(void);
+
 /*************************************************** Gerph *********
  Function:      palette_get_wimp_colour
  Description:   Get the RGB colour for a Wimp colour index

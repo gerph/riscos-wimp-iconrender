@@ -5,13 +5,32 @@
  ******************************************************************/
 
 #include "palette.h"
+#include <string.h>
 
-static const colour_t default_wimp_palette[] = {
-    0xffffff00, 0xdddddd00, 0xbbbbbb00, 0x99999900,
-    0x77777700, 0x55555500, 0x33333300, 0x00000000,
-    0x99440000, 0x00eeee00, 0x00cc0000, 0x0000dd00,
-    0xbbeeee00, 0x00885500, 0x00bbff00, 0xffbb0000
+wimp_palette_t default_wimp_palette = {
+    // Regular colours
+    {
+        0xffffff00, 0xdddddd00, 0xbbbbbb00, 0x99999900,
+        0x77777700, 0x55555500, 0x33333300, 0x00000000,
+        0x99440000, 0x00eeee00, 0x00cc0000, 0x0000dd00,
+        0xbbeeee00, 0x00885500, 0x00bbff00, 0xffbb0000
+    },
+
+    // Border colour
+    0x00000000,
+
+    // Pointer colours
+    {
+        0xFFFF0000, 0x99000000, 0xff000000
+    }
 };
+
+wimp_palette_t current_wimp_palette;
+
+void palette_init(void)
+{
+    memcpy(&current_wimp_palette, &default_wimp_palette, sizeof(default_wimp_palette));
+}
 
 /*************************************************** Gerph *********
  Function:      palette_get_wimp_colour
@@ -23,5 +42,5 @@ colour_t palette_get_wimp_colour(int index)
 {
     if (index < 0 || index >= 16)
         return 0;
-    return default_wimp_palette[index];
+    return current_wimp_palette.screen[index];
 }

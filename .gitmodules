@@ -4,3 +4,6 @@
 [submodule "riscos-wimp-textrender"]
 	path = riscos-wimp-textrender
 	url = https://github.com/gerph/riscos-wimp-textrender.git
+[submodule "riscos-wimp-spriterender"]
+	path = riscos-wimp-spriterender
+	url = https://github.com/gerph/riscos-wimp-spriterender.git

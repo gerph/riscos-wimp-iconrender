@@ -14,11 +14,13 @@
 #include "swis.h"
 #include "kernel.h"
 #include "textrender.h"
+#include "wimpgraphics.h"
 
 void testicon(void)
 {
     gcontext_t *gcontext;
     textrender_t *trender;
+    wimpgraphics_t *graphics;
     Wimp_Icon icon;
 
     // Catch NULL dereferences early
@@ -28,8 +30,11 @@ void testicon(void)
     _swi(OS_WriteC, _IN(0), 22);
     _swi(OS_WriteC, _IN(0), 28);
 
+    palette_init();
+
     gcontext = gcontext_initvdu(2);
     trender = textrender_init(gcontext);
+    graphics = wimpgraphics_create();
     textrender_setfont(trender); // CRITICAL: Initialize fonts for the context
 
     // Background
@@ -43,7 +48,7 @@ void testicon(void)
     icon.flags = Wimp_IconText | Wimp_IconBorder | Wimp_IconHCentred | Wimp_IconVCentred | Wimp_IconFilled;
     icon.flags |= (7 << Wimp_IconFGColourShift) | (0 << Wimp_IconBGColourShift);
     strcpy((char *)icon.data.text, "Simple Text");
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     // Test 2: Slabbed out icon
     icon.extent.x0 = 400; icon.extent.y0 = 800;
@@ -52,21 +57,21 @@ void testicon(void)
     icon.flags |= (7 << Wimp_IconFGColourShift) | (1 << Wimp_IconBGColourShift);
     icon.data.indirected_text.text = "Slab Out";
     icon.data.indirected_text.validation = "R1";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     // Test 3: Slabbed in icon
     icon.extent.x0 = 700; icon.extent.y0 = 800;
     icon.extent.x1 = 900; icon.extent.y1 = 900;
     icon.data.indirected_text.text = "Slab In";
     icon.data.indirected_text.validation = "R2";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     // Test 4: Action button (unpressed)
     icon.extent.x0 = 100; icon.extent.y0 = 650;
     icon.extent.x1 = 300; icon.extent.y1 = 750;
     icon.data.indirected_text.text = "Action";
     icon.data.indirected_text.validation = "R5";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     // Test 5: Action button (pressed)
     icon.extent.x0 = 400; icon.extent.y0 = 650;
@@ -74,7 +79,7 @@ void testicon(void)
     icon.flags |= Wimp_IconSelected;
     icon.data.indirected_text.text = "Pressed";
     icon.data.indirected_text.validation = "R5";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
     icon.flags &= ~Wimp_IconSelected;
 
     // Test 6: Default button (pressed)
@@ -83,16 +88,17 @@ void testicon(void)
     icon.flags |= Wimp_IconSelected;
     icon.data.indirected_text.text = "Default";
     icon.data.indirected_text.validation = "R6";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
     icon.flags &= ~Wimp_IconSelected;
 
     // Test 7: Text and Sprite icon
     icon.extent.x0 = 100; icon.extent.y0 = 500;
     icon.extent.x1 = 300; icon.extent.y1 = 600;
-    icon.flags = Wimp_IconText | Wimp_IconSprite | Wimp_IconBorder | Wimp_IconVCentred | Wimp_IconFilled;
+    icon.flags = Wimp_IconText | Wimp_IconSprite | Wimp_IconBorder | Wimp_IconVCentred | Wimp_IconFilled | Wimp_IconIndirected;
     icon.flags |= (7 << Wimp_IconFGColourShift) | (0 << Wimp_IconBGColourShift);
-    strcpy((char *)icon.data.text, "Text+Sprite");
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    icon.data.indirected_text.text = "Text+Sprite";
+    icon.data.indirected_text.validation = "Sfile_ff9";
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     // Test 8: 24-bit Color Override
     icon.extent.x0 = 400; icon.extent.y0 = 500;
@@ -101,7 +107,7 @@ void testicon(void)
     icon.data.indirected_text.text = "24-bit Color";
     // C00FF00,FF00FF00 override FG to green and BG to purple
     icon.data.indirected_text.validation = "C00FF00,FF00FF";
-    ploticon_render(gcontext, trender, &icon, 0, 0, palette_get_wimp_colour(1));
+    ploticon_render(gcontext, trender, graphics, &icon, 0, 0, palette_get_wimp_colour(1));
 
     exit(EXIT_SUCCESS);
 }

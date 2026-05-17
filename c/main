@@ -11,6 +11,10 @@
 
 void testicon(void);
 
+void *module_ws[4] = {0};
+void *module_pwvalue = module_ws;
+void *module_pw = &module_pwvalue;
+
 int main(int argc, char *argv[])
 {
     testicon();
