@@ -1,0 +1,36 @@
+/*******************************************************************
+ * File:        text.h
+ * Purpose:     Text rendering stubs
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef TEXT_H
+#define TEXT_H
+
+#include "GContext/gcontext.h"
+#include "palette.h"
+
+/*************************************************** Gerph *********
+ Function:      text_size
+ Description:   Get the size of some text
+ Parameters:    text = string
+                width -> where to store width
+                height -> where to store height
+ Returns:       void
+ ******************************************************************/
+void text_size(const char *text, int *width, int *height);
+
+/*************************************************** Gerph *********
+ Function:      text_render
+ Description:   Render some text stub
+ Parameters:    gcontext -> graphics context
+                fg, bg = colours
+                text = string
+                x, y = position
+                clip_x0, clip_y0, clip_x1, clip_y1 = clipping box
+ Returns:       void
+ ******************************************************************/
+void text_render(gcontext_t *gcontext, colour_t fg, colour_t bg, const char *text,
+                 int x, int y, int clip_x0, int clip_y0, int clip_x1, int clip_y1);
+
+#endif

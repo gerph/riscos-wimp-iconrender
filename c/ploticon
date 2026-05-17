@@ -1,0 +1,266 @@
+/*******************************************************************
+ * File:        ploticon.c
+ * Purpose:     Wimp icon plotting
+ * Author:      Gerph
+ ******************************************************************/
+
+#include "ploticon.h"
+#include "iconborders.h"
+#include "sprite.h"
+#include "text.h"
+#include "config.h"
+#include "validationcache.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+wimp_config_t wimp_config = {
+    true, // validation_c
+    true, // multiline_alignment
+    ShadedStyle_BackgroundBlend, // shaded_style
+    true // render_sprites
+};
+
+typedef struct {
+    int halign; // -1: left, 0: centre, 1: right
+    int valign; // -1: bottom, 0: centre, 1: top
+} alignment_t;
+
+static alignment_t get_text_alignment(uint32_t flags)
+{
+    bool hcentre = (flags & Wimp_IconHCentred) != 0;
+    bool vcentre = (flags & Wimp_IconVCentred) != 0;
+    bool rjustify = (flags & Wimp_IconRJustified) != 0;
+    bool sprite = (flags & Wimp_IconSprite) != 0;
+
+    alignment_t align = {-1, 0};
+
+    if (sprite)
+    {
+        if (!hcentre && !vcentre && !rjustify) { align.halign = -1; align.valign = -1; }
+        else if (rjustify && !hcentre && !vcentre) { align.halign = 1; align.valign = -1; }
+        else if (vcentre && !hcentre && !rjustify) { align.halign = -1; align.valign = 0; }
+        else if (rjustify && vcentre && !hcentre) { align.halign = -1; align.valign = 0; }
+        else if (hcentre && !vcentre && !rjustify) { align.halign = 0; align.valign = -1; }
+        else if (hcentre && rjustify && !vcentre) { align.halign = 0; align.valign = 1; }
+        else if (hcentre && vcentre && !rjustify) { align.halign = 0; align.valign = 0; }
+        else if (hcentre && rjustify && vcentre) { align.halign = 1; align.valign = 0; }
+    }
+    else
+    {
+        if (hcentre) align.halign = 0;
+        else if (rjustify) align.halign = 1;
+        else align.halign = -1;
+
+        if (vcentre) align.valign = 0;
+        else align.valign = 0; // PRM says text is vertically centred if VCentred is set, else it's... also centred?
+    }
+
+    return align;
+}
+
+static alignment_t get_sprite_alignment(uint32_t flags)
+{
+    bool hcentre = (flags & Wimp_IconHCentred) != 0;
+    bool vcentre = (flags & Wimp_IconVCentred) != 0;
+    bool rjustify = (flags & Wimp_IconRJustified) != 0;
+    bool text = (flags & Wimp_IconText) != 0;
+
+    alignment_t align = {-1, -1};
+
+    if (text)
+    {
+        if (!hcentre && !vcentre && !rjustify) { align.halign = -1; align.valign = 1; }
+        else if (rjustify && !hcentre && !vcentre) { align.halign = 1; align.valign = 1; }
+        else if (vcentre && !hcentre && !rjustify) { align.halign = -1; align.valign = 0; }
+        else if (rjustify && vcentre && !hcentre) { align.halign = 1; align.valign = 0; }
+        else if (hcentre && !vcentre && !rjustify) { align.halign = 0; align.valign = 1; }
+        else if (hcentre && rjustify && !vcentre) { align.halign = 0; align.valign = -1; }
+        else if (hcentre && vcentre && !rjustify) { align.halign = 0; align.valign = 0; }
+        else if (hcentre && rjustify && vcentre) { align.halign = -1; align.valign = 0; }
+    }
+    else
+    {
+        if (hcentre) align.halign = 0;
+        else if (rjustify) align.halign = 1;
+        else align.halign = -1;
+
+        if (vcentre) align.valign = 0;
+        else align.valign = -1;
+    }
+
+    return align;
+}
+
+static void get_icon_data(const Wimp_Icon *icon, const char **text, const char **validation, OSSpriteOp_Id *sprite_id, OSSpriteOp_Area **sprite_area)
+{
+    uint32_t flags = icon->flags;
+    *text = NULL;
+    *validation = NULL;
+    *sprite_id = NULL;
+    *sprite_area = NULL;
+
+    if (flags & Wimp_IconIndirected)
+    {
+        if (flags & Wimp_IconText)
+        {
+            *text = icon->data.indirected_text.text;
+            *validation = icon->data.indirected_text.validation;
+        }
+        else if (flags & Wimp_IconSprite)
+        {
+            *sprite_id = icon->data.indirected_sprite.id;
+            *sprite_area = icon->data.indirected_sprite.area;
+        }
+    }
+    else
+    {
+        if (flags & Wimp_IconText)
+        {
+            *text = (const char *)icon->data.text;
+        }
+        if (flags & Wimp_IconSprite)
+        {
+            *sprite_id = (OSSpriteOp_Id)icon->data.sprite;
+        }
+    }
+}
+
+void ploticon_render(gcontext_t *gcontext, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
+{
+    const char *text_str;
+    const char *validation_str;
+    OSSpriteOp_Id sprite_id;
+    OSSpriteOp_Area *sprite_area;
+    validationcache_t *vc;
+    int border_type;
+    bool selected;
+    bool shaded;
+    colour_t colours[6];
+    OS_Box bounds;
+    OS_Box border_bounds;
+    int icon_width;
+    int icon_height;
+
+    if (icon->flags & Wimp_IconDeleted) return;
+
+    get_icon_data(icon, &text_str, &validation_str, &sprite_id, &sprite_area);
+
+    vc = validationcache_create(validation_str);
+    border_type = vc ? vc->border_type : 0;
+    if (!(icon->flags & Wimp_IconBorder)) border_type = 0;
+
+    selected = (icon->flags & Wimp_IconSelected) != 0;
+    shaded = (icon->flags & Wimp_IconShaded) != 0;
+
+    iconborders_get_default_colours(border_type, colours);
+
+    // Override with icon colours
+    colours[COLOUR_FG] = palette_get_wimp_colour((icon->flags & Wimp_IconFGColour) >> Wimp_IconFGColourShift);
+    colours[COLOUR_BG] = palette_get_wimp_colour((icon->flags & Wimp_IconBGColour) >> Wimp_IconBGColourShift);
+
+    if (vc && vc->valid.colours)
+    {
+        int i;
+        for (i = 0; i < 6; i++)
+        {
+            if (vc->colours[i] != 0) // Simple check if colour was parsed
+                colours[i] = vc->colours[i];
+        }
+    }
+
+    if (selected)
+    {
+        // Simple selection swap if no special border
+        if (border_type == 0)
+        {
+            colour_t tmp = colours[COLOUR_FG];
+            colours[COLOUR_FG] = colours[COLOUR_BG];
+            colours[COLOUR_BG] = tmp;
+        }
+        // TODO: Other border selection colouring
+    }
+
+    // TODO: Shading
+
+    bounds = icon->extent;
+    bounds.x0 += x; bounds.x1 += x;
+    bounds.y0 += y; bounds.y1 += y;
+
+    border_bounds = bounds;
+
+    if (icon->flags & Wimp_IconFilled)
+    {
+        gcontext->rectangle_fill(gcontext, colours[COLOUR_BG], bounds.x0, bounds.y0, bounds.x1, bounds.y1);
+    }
+
+    if (icon->flags & Wimp_IconBorder)
+    {
+        iconborders_get_inner_box(border_type, selected, &bounds);
+    }
+
+    icon_width = bounds.x1 - bounds.x0;
+    icon_height = bounds.y1 - bounds.y0;
+
+    if (icon->flags & Wimp_IconSprite)
+    {
+        int sw, sh;
+        alignment_t align;
+        int sx;
+        int sy;
+
+        sprite_size(sprite_id, sprite_area, (icon->flags & Wimp_IconHalfSize) != 0, &sw, &sh);
+        align = get_sprite_alignment(icon->flags);
+        
+        sx = bounds.x0;
+        sy = bounds.y0;
+
+        if (align.halign == 0) sx += (icon_width - sw) / 2;
+        else if (align.halign == 1) sx += (icon_width - sw);
+
+        if (align.valign == 0) sy += (icon_height - sh) / 2;
+        else if (align.valign == 1) sy += (icon_height - sh);
+
+        sprite_render(gcontext, sprite_id, sprite_area, sx, sy, 
+                      (icon->flags & Wimp_IconHalfSize) != 0, 
+                      selected, shaded, bg_colour);
+        
+        // Adjust bounds if text is also present and VCentred (to right of sprite)
+        if ((icon->flags & Wimp_IconText) && (icon->flags & Wimp_IconVCentred) && !(icon->flags & Wimp_IconHCentred))
+        {
+            bounds.x0 += sw + 12;
+            icon_width = bounds.x1 - bounds.x0;
+            icon_height = bounds.y1 - bounds.y0;
+        }
+    }
+
+    if (icon->flags & Wimp_IconText)
+    {
+        int tw, th;
+        alignment_t align;
+        int tx;
+        int ty;
+
+        text_size(text_str, &tw, &th);
+        align = get_text_alignment(icon->flags);
+
+        tx = bounds.x0;
+        ty = bounds.y0;
+
+        if (align.halign == 0) tx += (icon_width - tw) / 2;
+        else if (align.halign == 1) tx += (icon_width - tw);
+
+        if (align.valign == 0) ty += (icon_height - th) / 2;
+        else if (align.valign == 1) ty += (icon_height - th);
+
+        text_render(gcontext, colours[COLOUR_FG], colours[COLOUR_BG], text_str,
+                    tx, ty, bounds.x0, bounds.y0, bounds.x1, bounds.y1);
+    }
+
+    if (icon->flags & Wimp_IconBorder)
+    {
+        iconborders_render(gcontext, border_type, selected, &border_bounds, colours);
+    }
+
+    if (vc) free(vc);
+}

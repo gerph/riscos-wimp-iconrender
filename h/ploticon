@@ -1,0 +1,26 @@
+/*******************************************************************
+ * File:        ploticon.h
+ * Purpose:     Wimp icon plotting
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef PLOTICON_H
+#define PLOTICON_H
+
+#include "GContext/gcontext.h"
+#include "types.h"
+#include "palette.h"
+
+
+/*************************************************** Gerph *********
+ Function:      ploticon_render
+ Description:   Render a Wimp icon
+ Parameters:    gcontext -> graphics context
+                icon -> icon definition
+                x, y = offset to apply to icon position
+                bg_colour = window background colour (&BBGGRR00)
+ Returns:       void
+ ******************************************************************/
+void ploticon_render(gcontext_t *gcontext, const Wimp_Icon *icon, int x, int y, colour_t bg_colour);
+
+#endif

@@ -1,0 +1,56 @@
+/*******************************************************************
+ * File:        sprite.c
+ * Purpose:     Sprite rendering implementation (placeholders)
+ * Author:      Gerph
+ ******************************************************************/
+
+#include "sprite.h"
+
+/*************************************************** Gerph *********
+ Function:      sprite_size
+ Description:   Get the size of a sprite
+ Parameters:    id = sprite ID or name
+                area = sprite area
+                is_halfsize = true if half size
+                width -> where to store width
+                height -> where to store height
+ Returns:       void
+ ******************************************************************/
+void sprite_size(OSSpriteOp_Id id, OSSpriteOp_Area *area, bool is_halfsize, int *width, int *height)
+{
+    (void)id;
+    (void)area;
+    // Standard icon size is 68x68 OS units, or 34x34 if half size
+    *width = is_halfsize ? 34 : 68;
+    *height = is_halfsize ? 34 : 68;
+}
+
+/*************************************************** Gerph *********
+ Function:      sprite_render
+ Description:   Render a sprite placeholder
+ Parameters:    gcontext -> graphics context
+                id = sprite ID or name
+                area = sprite area
+                x, y = position
+                is_halfsize = true if half size
+                is_selected = true if selected
+                is_shaded = true if shaded
+                window_background = window background colour
+ Returns:       void
+ ******************************************************************/
+void sprite_render(gcontext_t *gcontext, OSSpriteOp_Id id, OSSpriteOp_Area *area,
+                   int x, int y, bool is_halfsize, bool is_selected, bool is_shaded,
+                   colour_t window_background)
+{
+    int w = is_halfsize ? 34 : 68;
+    int h = is_halfsize ? 34 : 68;
+    colour_t col = COLOUR_RGB(255, 0, 0); // Red placeholder
+
+    (void)id;
+    (void)area;
+    (void)is_selected;
+    (void)is_shaded;
+    (void)window_background;
+
+    gcontext->rectangle_fill(gcontext, col, x, y, x + w, y + h);
+}

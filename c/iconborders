@@ -1,0 +1,126 @@
+/*******************************************************************
+ * File:        iconborders.c
+ * Purpose:     Icon border rendering
+ * Author:      Gerph
+ ******************************************************************/
+
+#include "iconborders.h"
+#include <string.h>
+
+typedef struct {
+    int top, left, bottom, right;
+    int width;
+} rim_t;
+
+typedef struct {
+    int type;
+    bool selected;
+    int rim_count;
+    rim_t rims[3];
+} border_def_t;
+
+static const border_def_t border_defs[] = {
+    {0, false, 1, {{COLOUR_FG, COLOUR_FG, COLOUR_FG, COLOUR_FG, 1}}},
+    {1, false, 1, {{COLOUR_FACE, COLOUR_FACE, COLOUR_OPP, COLOUR_OPP, 4}}},
+    {2, false, 1, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4}}},
+    {3, false, 2, {{COLOUR_FACE, COLOUR_FACE, COLOUR_OPP, COLOUR_OPP, 4},
+                   {COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4}}},
+    {4, false, 2, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4},
+                   {COLOUR_FACE, COLOUR_FACE, COLOUR_OPP, COLOUR_OPP, 4}}},
+    {5, false, 1, {{COLOUR_FACE, COLOUR_FACE, COLOUR_OPP, COLOUR_OPP, 4}}},
+    {5, true,  1, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4}}},
+    {6, false, 3, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4},
+                   {COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, 4},
+                   {COLOUR_FACE, COLOUR_FACE, COLOUR_OPP, COLOUR_OPP, 4}}},
+    {6, true,  3, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4},
+                   {COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, 4},
+                   {COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4}}},
+    {7, false, 3, {{COLOUR_OPP, COLOUR_OPP, COLOUR_FACE, COLOUR_FACE, 4},
+                   {COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, COLOUR_WELL, 4},
+                   {COLOUR_FG, COLOUR_FG, COLOUR_FG, COLOUR_FG, 1}}}
+};
+
+static const border_def_t *find_border_def(int border_type, bool selected)
+{
+    int i;
+    const border_def_t *fallback = NULL;
+    for (i = 0; i < sizeof(border_defs) / sizeof(border_defs[0]); i++)
+    {
+        if (border_defs[i].type == border_type)
+        {
+            if (border_defs[i].selected == selected)
+                return &border_defs[i];
+            if (border_defs[i].selected == false)
+                fallback = &border_defs[i];
+        }
+    }
+    return fallback ? fallback : &border_defs[0];
+}
+
+void iconborders_get_inner_box(int border_type, bool selected, OS_Box *box)
+{
+    const border_def_t *def = find_border_def(border_type, selected);
+    int i;
+    for (i = 0; i < def->rim_count; i++)
+    {
+        int width = def->rims[i].width;
+        if (width == 1) width = 2; // Assuming 2 OS units per pixel
+        box->x0 += width;
+        box->y0 += width;
+        box->x1 -= width;
+        box->y1 -= width;
+    }
+}
+
+void iconborders_render(gcontext_t *gcontext, int border_type, bool selected, const OS_Box *box, colour_t *colours)
+{
+    const border_def_t *def = find_border_def(border_type, selected);
+    OS_Box b = *box;
+    int i;
+    int pixel_size = 2; // Assuming 2 OS units per pixel
+
+    for (i = 0; i < def->rim_count; i++)
+    {
+        int width = def->rims[i].width;
+        int step;
+        if (width == 1) width = pixel_size;
+        
+        for (step = 0; step < width; step += pixel_size)
+        {
+            // Top
+            gcontext->rectangle_fill(gcontext, colours[def->rims[i].top], b.x0, b.y1 - pixel_size, b.x1, b.y1);
+            // Bottom
+            gcontext->rectangle_fill(gcontext, colours[def->rims[i].bottom], b.x0, b.y0, b.x1, b.y0 + pixel_size);
+            // Left
+            gcontext->rectangle_fill(gcontext, colours[def->rims[i].left], b.x0, b.y0, b.x0 + pixel_size, b.y1);
+            // Right
+            gcontext->rectangle_fill(gcontext, colours[def->rims[i].right], b.x1 - pixel_size, b.y0, b.x1, b.y1);
+
+            b.x0 += pixel_size;
+            b.y0 += pixel_size;
+            b.x1 -= pixel_size;
+            b.y1 -= pixel_size;
+        }
+    }
+}
+
+static const int border_wimp_colours[][6] = {
+    {7, 1, 3, 1, 0, 4}, // 0
+    {7, 1, 3, 1, 0, 4}, // 1
+    {7, 1, 3, 1, 0, 4}, // 2
+    {7, 1, 3, 1, 0, 2}, // 3
+    {7, 1, 3, 1, 0, 2}, // 4
+    {7, 1, 3, 1, 0, 4}, // 5
+    {7, 1, 3, 12, 0, 4}, // 6
+    {7, 0, 3, 1, 0, 4}  // 7
+};
+
+void iconborders_get_default_colours(int border_type, colour_t *colours)
+{
+    int i;
+    if (border_type < 0 || border_type > 7) border_type = 0;
+    for (i = 0; i < 6; i++)
+    {
+        colours[i] = palette_get_wimp_colour(border_wimp_colours[border_type][i]);
+    }
+}

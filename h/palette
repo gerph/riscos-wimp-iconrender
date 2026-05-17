@@ -1,0 +1,21 @@
+/*******************************************************************
+ * File:        palette.h
+ * Purpose:     Wimp palette handling
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef PALETTE_H
+#define PALETTE_H
+
+#include <stdint.h>
+#include "GContext/gcontext.h"
+
+/*************************************************** Gerph *********
+ Function:      palette_get_wimp_colour
+ Description:   Get the RGB colour for a Wimp colour index
+ Parameters:    index = Wimp colour index (0-15)
+ Returns:       &BBGGRR00 colour
+ ******************************************************************/
+colour_t palette_get_wimp_colour(int index);
+
+#endif

@@ -1,0 +1,43 @@
+/*******************************************************************
+ * File:        sprite.h
+ * Purpose:     Sprite rendering stubs
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef SPRITE_H
+#define SPRITE_H
+
+#include "GContext/gcontext.h"
+#include "types.h"
+#include "palette.h"
+
+/*************************************************** Gerph *********
+ Function:      sprite_size
+ Description:   Get the size of a sprite
+ Parameters:    id = sprite ID or name
+                area = sprite area
+                is_halfsize = true if half size
+                width -> where to store width
+                height -> where to store height
+ Returns:       void
+ ******************************************************************/
+void sprite_size(OSSpriteOp_Id id, OSSpriteOp_Area *area, bool is_halfsize, int *width, int *height);
+
+/*************************************************** Gerph *********
+ Function:      sprite_render
+ Description:   Render a sprite stub
+ Parameters:    gcontext -> graphics context
+                id = sprite ID or name
+                area = sprite area
+                x, y = position
+                is_halfsize = true if half size
+                is_selected = true if selected
+                is_shaded = true if shaded
+                window_background = window background colour
+ Returns:       void
+ ******************************************************************/
+void sprite_render(gcontext_t *gcontext, OSSpriteOp_Id id, OSSpriteOp_Area *area,
+                   int x, int y, bool is_halfsize, bool is_selected, bool is_shaded,
+                   colour_t window_background);
+
+#endif

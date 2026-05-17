@@ -9,9 +9,9 @@
 
 #include "VersionNum"
 
-void testgcontext(void);
+void testicon(void);
 
 int main(int argc, char *argv[])
 {
-    testgcontext();
+    testicon();
 }

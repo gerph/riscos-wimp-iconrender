@@ -1,0 +1,27 @@
+/*******************************************************************
+ * File:        config.h
+ * Purpose:     Configuration for the Wimp icon rendering
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#include <stdbool.h>
+
+typedef enum {
+    ShadedStyle_Grey,
+    ShadedStyle_GreyBlend,
+    ShadedStyle_BackgroundBlend
+} shaded_style_t;
+
+typedef struct {
+    bool validation_c;
+    bool multiline_alignment;
+    shaded_style_t shaded_style;
+    bool render_sprites;
+} wimp_config_t;
+
+extern wimp_config_t wimp_config;
+
+#endif

@@ -1,0 +1,52 @@
+/*******************************************************************
+ * File:        iconborders.h
+ * Purpose:     Icon border rendering
+ * Author:      Gerph
+ ******************************************************************/
+
+#ifndef ICONBORDERS_H
+#define ICONBORDERS_H
+
+#include "GContext/gcontext.h"
+#include "types.h"
+#include "palette.h"
+
+#define COLOUR_FG    0
+#define COLOUR_BG    1
+#define COLOUR_SELBG 2
+#define COLOUR_WELL  3
+#define COLOUR_FACE  4
+#define COLOUR_OPP   5
+
+/*************************************************** Gerph *********
+ Function:      iconborders_get_inner_box
+ Description:   Calculate the inner box for a border
+ Parameters:    border_type = border type (0-7)
+                selected = true if selected
+                box -> box to update (in-out)
+ Returns:       void
+ ******************************************************************/
+void iconborders_get_inner_box(int border_type, bool selected, OS_Box *box);
+
+/*************************************************** Gerph *********
+ Function:      iconborders_render
+ Description:   Render a border
+ Parameters:    gcontext -> graphics context
+                border_type = border type (0-7)
+                selected = true if selected
+                box -> bounding box
+                colours -> array of 6 colours (FG, BG, SELBG, WELL, FACE, OPP)
+ Returns:       void
+ ******************************************************************/
+void iconborders_render(gcontext_t *gcontext, int border_type, bool selected, const OS_Box *box, colour_t *colours);
+
+/*************************************************** Gerph *********
+ Function:      iconborders_get_default_colours
+ Description:   Get the default colours for a border type
+ Parameters:    border_type = border type (0-7)
+                colours -> array of 6 colours to populate
+ Returns:       void
+ ******************************************************************/
+void iconborders_get_default_colours(int border_type, colour_t *colours);
+
+#endif

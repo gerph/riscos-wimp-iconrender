@@ -33,7 +33,15 @@ CDEFINES   =
 LIBS       = ${CLIB} C:GContext.o.libGContext
 
 # Objects to build, using the format o.<name> (will be varied for build type)
-OBJS       = o.main o.testgcontext
+OBJS       = o.main \
+             o.testicon \
+             o.ploticon \
+             o.iconborders \
+             o.palette \
+             o.sprite \
+             o.text \
+             o.validation \
+             o.validationcache
 
 # Space separated list of XML files for building documentation.
 #DOCSRC = <prm-in-xml-sources>
@@ -44,3 +52,4 @@ include LibraryCommand
 
 #---------------------------------------------------------------------------
 # Dynamic dependencies:
+

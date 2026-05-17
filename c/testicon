@@ -1,0 +1,95 @@
+/*******************************************************************
+ * File:        testicon.c
+ * Purpose:     Test icon rendering
+ * Author:      Gerph
+ ******************************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "GContext/gcontext.h"
+#include "ploticon.h"
+#include "palette.h"
+
+
+void testicon(void)
+{
+    gcontext_t *gcontext = gcontext_initvdu(2);
+    Wimp_Icon icon;
+
+    // Background
+    gcontext->rectangle_fill(gcontext, palette_get_wimp_colour(1), 0, 0, 1280, 1024);
+
+    memset(&icon, 0, sizeof(icon));
+
+    // Test 1: Simple text icon with border
+    icon.extent.x0 = 100; icon.extent.y0 = 800;
+    icon.extent.x1 = 300; icon.extent.y1 = 900;
+    icon.flags = Wimp_IconText | Wimp_IconBorder | Wimp_IconHCentred | Wimp_IconVCentred | Wimp_IconFilled;
+    icon.flags |= (7 << Wimp_IconFGColourShift) | (0 << Wimp_IconBGColourShift);
+    strcpy((char *)icon.data.text, "Simple Text");
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Test 2: Slabbed out icon
+    icon.extent.x0 = 400; icon.extent.y0 = 800;
+    icon.extent.x1 = 600; icon.extent.y1 = 900;
+    icon.flags = Wimp_IconText | Wimp_IconBorder | Wimp_IconHCentred | Wimp_IconVCentred | Wimp_IconFilled | Wimp_IconIndirected;
+    icon.flags |= (7 << Wimp_IconFGColourShift) | (1 << Wimp_IconBGColourShift);
+    icon.data.indirected_text.text = "Slab Out";
+    icon.data.indirected_text.validation = "R1";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Test 3: Slabbed in icon
+    icon.extent.x0 = 700; icon.extent.y0 = 800;
+    icon.extent.x1 = 900; icon.extent.y1 = 900;
+    icon.data.indirected_text.text = "Slab In";
+    icon.data.indirected_text.validation = "R2";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Test 4: Action button (unpressed)
+    icon.extent.x0 = 100; icon.extent.y0 = 650;
+    icon.extent.x1 = 300; icon.extent.y1 = 750;
+    icon.data.indirected_text.text = "Action";
+    icon.data.indirected_text.validation = "R5";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Test 5: Action button (pressed)
+    icon.extent.x0 = 400; icon.extent.y0 = 650;
+    icon.extent.x1 = 600; icon.extent.y1 = 750;
+    icon.flags |= Wimp_IconSelected;
+    icon.data.indirected_text.text = "Pressed";
+    icon.data.indirected_text.validation = "R5";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+    icon.flags &= ~Wimp_IconSelected;
+
+    // Test 6: Default button (pressed)
+    icon.extent.x0 = 700; icon.extent.y0 = 650;
+    icon.extent.x1 = 900; icon.extent.y1 = 750;
+    icon.flags |= Wimp_IconSelected;
+    icon.data.indirected_text.text = "Default";
+    icon.data.indirected_text.validation = "R6";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+    icon.flags &= ~Wimp_IconSelected;
+
+    // Test 7: Text and Sprite icon
+    icon.extent.x0 = 100; icon.extent.y0 = 500;
+    icon.extent.x1 = 300; icon.extent.y1 = 600;
+    icon.flags = Wimp_IconText | Wimp_IconSprite | Wimp_IconBorder | Wimp_IconVCentred | Wimp_IconFilled;
+    icon.flags |= (7 << Wimp_IconFGColourShift) | (0 << Wimp_IconBGColourShift);
+    strcpy((char *)icon.data.text, "Text+Sprite");
+    // Sprite name would be in icon.data.sprite if not indirected, 
+    // but here we just set the flag and our placeholder will draw a red box.
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Test 8: 24-bit Color Override
+    icon.extent.x0 = 400; icon.extent.y0 = 500;
+    icon.extent.x1 = 600; icon.extent.y1 = 600;
+    icon.flags = Wimp_IconText | Wimp_IconBorder | Wimp_IconHCentred | Wimp_IconVCentred | Wimp_IconFilled | Wimp_IconIndirected;
+    icon.data.indirected_text.text = "24-bit Color";
+    // C00FF00,FF00FF00 override FG to green and BG to purple
+    icon.data.indirected_text.validation = "C00FF00,FF00FF";
+    ploticon_render(gcontext, &icon, 0, 0, palette_get_wimp_colour(1));
+
+    exit(EXIT_SUCCESS);
+}
