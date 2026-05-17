@@ -37,8 +37,6 @@ OBJS       = o.colourmap \
              o.colourtrans \
              o.iconborders \
              o.main \
-             o.modhead \
-             o.module \
              o.palette \
              o.ploticon \
              o.scale \
