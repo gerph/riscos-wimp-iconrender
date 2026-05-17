@@ -1,0 +1,17 @@
+/*******************************************************************
+ * File:        main
+ * Purpose:     GContextExample command line tool
+ * Author:      Gerph
+ ******************************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "VersionNum"
+
+void testgcontext(void);
+
+int main(int argc, char *argv[])
+{
+    testgcontext();
+}
