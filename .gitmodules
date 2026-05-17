@@ -1,0 +1,3 @@
+[submodule "riscos-wimp-validationstrings"]
+	path = riscos-wimp-validationstrings
+	url = https://github.com/gerph/riscos-wimp-validationstrings.git
