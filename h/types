@@ -1,0 +1,1375 @@
+/*******************************************************************
+ * File:     types
+ * Purpose:  Types used for the Wimp module
+ * Author:   Gerph
+ * Date:     25 Aug 2025
+ ******************************************************************/
+
+#ifndef TYPES_H
+#define TYPES_H
+
+#include <stdint.h>
+#include <stdbool.h>
+
+
+/* Constants */
+
+/* &.Byte */
+#define Wimp_NoFonts                             ((uint8_t *)-1)
+
+/* &OS_Palette */
+#define Wimp_DefaultPalette                      ((OS_Palette *)-1)
+#define Wimp_Palette                             ((OS_Palette *)0)
+
+/* &Wimp_Menu */
+#define Wimp_NoSubMenu                           ((Wimp_Menu *)-1)
+#define Wimp_DeferSubMenu                        ((Wimp_Menu *)(1<<0))
+#define Wimp_CloseMenu                           ((Wimp_Menu *)-1)
+
+/* &Wimp_Window */
+#define Wimp_GetSize                             ((Wimp_Window *)0)
+
+/* .Asm */
+#define Wimp_AutoScrollDefaultHandler            ((void *)(1<<0))
+#define Wimp_AutoScrollNoHandler                 ((void *)0)
+
+/* .Bits */
+#define Message_MenuWarning                      ((uint32_t)0x400c0)
+#define Message_ScreenEdgeNotification           ((uint32_t)0x400d2) /* RISC OS 4.20+ */
+#define Message_RAMTransmit                      ((uint32_t)0x7)
+#define Message_TaskStarted                      ((uint32_t)0x400c8)
+#define Message_TaskNameIs                       ((uint32_t)0x400c7)
+#define Error_WimpBadPtrInR1                     ((uint32_t)0x29f) /* Bad pointer passed to Wimp in R1 */
+#define Error_WimpBadExtent                      ((uint32_t)0x28a) /* Bad work area extent */
+#define Error_WimpBadEscapeState                 ((uint32_t)0x2a0) /* Wimp_Poll called with escape enabled */
+#define Error_WimpOwnerWindow                    ((uint32_t)0x29b) /* Access to window denied */
+#define Error_WimpNoDotInFilename                ((uint32_t)0x2a3) /* To save: drag the icon to a directory viewer */
+#define Error_WimpDivBy0                         ((uint32_t)0x285) /* Division by zero */
+#define Error_WimpBadMode                        ((uint32_t)0x29c) /* Bad Wimp mode */
+#define Message_FontChanged                      ((uint32_t)0x400cf)
+#define Message_ToggleBackdrop                   ((uint32_t)0x400d1) /* RISC OS 4.20+ */
+#define Error_WimpTooMenus                       ((uint32_t)0x289) /* Too many menus */
+#define Message_Quit                             ((uint32_t)0x0)
+#define Error_WimpNoClaim                        ((uint32_t)0x280) /* Wimp unable to claim work area */
+#define Message_Prequit                          ((uint32_t)0x8)
+#define Message_MenusDeleted                     ((uint32_t)0x400c9)
+#define Message_RAMFetch                         ((uint32_t)0x6)
+#define Error_WimpBadMessageSize                 ((uint32_t)0x296) /* Message block too big/not a multiple of 4 */
+#define Error_WimpBadR3                          ((uint32_t)0x2a2) /* Illegal Wimp_Poll pointer in R3 */
+#define Error_WimpBadSubMenu                     ((uint32_t)0x29a) /* SubMenus require a parent menu tree */
+#define Message_PaletteChange                    ((uint32_t)0x9)
+#define Message_DeviceInUse                      ((uint32_t)0xc)
+#define Message_TaskInitialise                   ((uint32_t)0x400c2)
+#define Message_IconiseAt                        ((uint32_t)0x400d0) /* RISC OS 4+ */
+#define Message_ToolsChanged                     ((uint32_t)0x400ce)
+#define Error_WimpTooMany                        ((uint32_t)0x283) /* Too many windows */
+#define Error_WimpBadIconHandle                  ((uint32_t)0x2a1) /* Illegal icon handle */
+#define Error_WimpBadReasonCode                  ((uint32_t)0x297) /* Illegal reason code */
+#define Error_WimpBadPalFile                     ((uint32_t)0x294) /* Error in palette file */
+#define Message_SetSlot                          ((uint32_t)0x400c5)
+#define Error_WimpBadSprites                     ((uint32_t)0x2a9) /* Squashed or missing sprite file */
+#define Error_WimpBadTemplate                    ((uint32_t)0x28d) /* Template entry invalid */
+#define Message_Swap                             ((uint32_t)0x400cd)
+#define Error_WimpBadConfFont                    ((uint32_t)0x2a6) /* bad configuration font */
+#define Message_WindowClosed                     ((uint32_t)0x400cb)
+#define Error_WimpBadTaskHandle                  ((uint32_t)0x298) /* Illegal task handle */
+#define Error_WimpFocus                          ((uint32_t)0x287) /* Input focus window not found */
+#define Error_WimpTooBig                         ((uint32_t)0x284) /* Window definition won't fit */
+#define Error_WimpNotPresent                     ((uint32_t)0x292) /* Window manager not present/too old */
+#define Error_WimpTemplateEOF                    ((uint32_t)0x2a4) /* End of file while reading template file */
+#define Message_DataLoadAck                      ((uint32_t)0x4)
+#define Error_WimpBadVersion                     ((uint32_t)0x295) /* Bad version number */
+#define Error_WimpBadSlot                        ((uint32_t)0x2a5) /* Wimp transfer required paging in beyond end of slot */
+#define Message_Dragging                         ((uint32_t)0x11)
+#define Message_Iconise                          ((uint32_t)0x400ca)
+#define Message_TaskCloseDown                    ((uint32_t)0x400c3)
+#define Error_WimpBadFonts                       ((uint32_t)0x28e) /* Unable to bind font handle */
+#define Message_WindowInfo                       ((uint32_t)0x400cc)
+#define Error_WimpBadPalFile2                    ((uint32_t)0x2a8) /* BadPalFile2 */
+#define Error_WimpGetRect                        ((uint32_t)0x286) /* Get_Rectangle not called correctly */
+#define Error_WimpRectFull                       ((uint32_t)0x282) /* Rectangle area full */
+#define Error_WimpNoSprites                      ((uint32_t)0x2a7) /* Not enough room for sprites */
+#define Error_WimpCantTask                       ((uint32_t)0x299) /* Can't start task from here */
+#define Error_WimpBadPointer                     ((uint32_t)0x28b) /* Syntax: *POINTER <0|1|2> */
+#define Message_DragClaim                        ((uint32_t)0x12)
+#define Error_WimpBadParent                      ((uint32_t)0x2aa) /* Bad parent window */
+#define Message_DeviceClaim                      ((uint32_t)0xb)
+#define Message_DataRequest                      ((uint32_t)0x10)
+#define Message_DataSave                         ((uint32_t)0x1)
+#define Message_DataSaveAck                      ((uint32_t)0x2)
+#define Message_AppControl                       ((uint32_t)0x15)
+#define Message_PreQuit                          ((uint32_t)0x8)
+#define Error_WimpNoTemplate                     ((uint32_t)0x291) /* Template entry not found */
+#define Error_WimpNoTemplateFile                 ((uint32_t)0x28c) /* Template file not found */
+#define Message_Shutdown                         ((uint32_t)0xe)
+#define Message_ClaimEntity                      ((uint32_t)0xf)
+#define Message_TaskNameRq                       ((uint32_t)0x400c6)
+#define Message_DataOpen                         ((uint32_t)0x5)
+#define Error_WimpBadHandle                      ((uint32_t)0x288) /* Illegal window handle */
+#define Message_ModeChange                       ((uint32_t)0x400c1)
+#define Error_WimpBadSyntax                      ((uint32_t)0x28f) /* Syntax error in validation string */
+#define Message_SlotSize                         ((uint32_t)0x400c4)
+#define Message_DataSaved                        ((uint32_t)0xd)
+#define Message_SaveDesktop                      ((uint32_t)0xa)
+#define Error_WimpInUse                          ((uint32_t)0x293) /* Window manager in use */
+#define Message_DataLoad                         ((uint32_t)0x3)
+#define Error_WimpBadSysInfo                     ((uint32_t)0x29e) /* Bad parameter passed to Wimp in R0 */
+#define Error_WimpBadOp                          ((uint32_t)0x281) /* Invalid Wimp operation in this context */
+#define Message_ReleaseEntity                    ((uint32_t)0x13)
+#define Error_WimpNoTasks                        ((uint32_t)0x290) /* Too many tasks */
+#define Error_WimpBadTransfer                    ((uint32_t)0x29d) /* Wimp transfer out of range */
+
+/* .Int */
+#define Wimp_TemplateNameLimit                   (12)
+#define Wimp_ErrorBoxCategoryShift               (9)
+#define Wimp_MenuItemSeparation                  (24)
+#define Wimp_CharYSize                           ((1<<5)) /* Height of system font (in OS U) */
+#define Wimp_IconFontHandleShift                 (24)
+#define Wimp_ChildLSEdgeShift                    (16) /* influences left side edge of child */
+#define Wimp_IconBGColourShift                   (28)
+#define Wimp_ChildRSEdgeShift                    (20) /* influences right side edge of child */
+#define Wimp_ChildTSEdgeShift                    (22) /* influences top side edge of child */
+#define Wimp_IconButtonTypeShift                 (12)
+#define Wimp_IconNameLimit                       (12)
+#define Wimp_ChildXOriginShift                   (24) /* influences the x origin of child */
+#define Wimp_MenuItemHeight                      (44)
+#define Wimp_IconESGShift                        (16)
+#define Wimp_CharXSize                           ((1<<4)) /* Width of system font (in OS U) */
+#define Wimp_ChildYOriginShift                   (26) /* influences the y origin of child */
+#define Wimp_MenuNameLimit                       (12)
+#define Wimp_MenuItemGap                         (0)
+#define Wimp_ErrorBoxQuitResponseShift           (28) /* RISC OS 4+ */
+#define OS_ErrorLimit                            (252)
+#define Wimp_ChildBSEdgeShift                    (18) /* influences bottom side edge of child */
+#define Wimp_MenuDepthLimit                      (8)
+#define Wimp_ErrorBoxContinueResponseShift       (24) /* RISC OS 4+ */
+#define Wimp_IconFGColourShift                   (24)
+
+/* WimpTextOp_PaintFlags */
+#define WimpTextOp_VJustify                      ((WimpTextOp_PaintFlags)0x10000000)
+#define WimpTextOp_GivenBaseline                 ((WimpTextOp_PaintFlags)0x40000000)
+#define WimpTextOp_OffsetsForRedraw              ((WimpTextOp_PaintFlags)0x20000000)
+#define WimpTextOp_RJustify                      ((WimpTextOp_PaintFlags)0x80000000)
+
+/* WimpTextOp_StringWidthFlags */
+#define WimpTextOp_SizeCovered                   ((WimpTextOp_StringWidthFlags)0x80000000) /* RISC OS 4.32+ */
+
+/* Wimp_AppControlFlags */
+#define Wimp_AppControlImmediate                 ((Wimp_AppControlFlags)(1<<0))
+
+/* Wimp_AppControlOperation */
+#define Wimp_AppControlOpenConfiguration         ((Wimp_AppControlOperation)(1<<2))
+#define Wimp_AppControlPause                     ((Wimp_AppControlOperation)(1<<1))
+#define Wimp_AppControlMinimiseMemory            ((Wimp_AppControlOperation)3)
+#define Wimp_AppControlWakeUp                    ((Wimp_AppControlOperation)(1<<0))
+#define Wimp_AppControlStop                      ((Wimp_AppControlOperation)0)
+
+/* Wimp_AutoScrollFlags */
+#define Wimp_AutoScrollEnableVertical            ((Wimp_AutoScrollFlags)(1<<1))
+#define Wimp_AutoScrollDelegateToTask            ((Wimp_AutoScrollFlags)(1<<2))
+#define Wimp_AutoScrollEnableHorizontal          ((Wimp_AutoScrollFlags)(1<<0))
+#define Wimp_AutoScrollReadState                 ((Wimp_AutoScrollFlags)(1<<7))
+
+/* Wimp_ClaimFlags */
+#define Wimp_ClaimCaretOrSelection               ((Wimp_ClaimFlags)3) /* caret or selection being claimed */
+#define Wimp_ClaimClipboard                      ((Wimp_ClaimFlags)(1<<2)) /* clipboard being claimed */
+
+/* Wimp_Colour */
+#define Wimp_ColourYellow                        ((Wimp_Colour)9)
+#define Wimp_ColourLightGreen                    ((Wimp_Colour)10)
+#define Wimp_ColourBlack                         ((Wimp_Colour)7)
+#define Wimp_ColourVeryLightGrey                 ((Wimp_Colour)(1<<0))
+#define Wimp_ColourWhite                         ((Wimp_Colour)0)
+#define Wimp_ColourDarkGrey                      ((Wimp_Colour)5)
+#define Wimp_ColourLightBlue                     ((Wimp_Colour)15)
+#define Wimp_ColourCream                         ((Wimp_Colour)12)
+#define Wimp_ColourDarkGreen                     ((Wimp_Colour)13)
+#define Wimp_ColourVeryDarkGrey                  ((Wimp_Colour)6)
+#define Wimp_ColourDarkBlue                      ((Wimp_Colour)(1<<3))
+#define Wimp_ColourTransparent                   ((Wimp_Colour)-1)
+#define Wimp_ColourRed                           ((Wimp_Colour)11)
+#define Wimp_ColourOrange                        ((Wimp_Colour)14)
+#define Wimp_ColourLightGrey                     ((Wimp_Colour)(1<<1))
+#define Wimp_ColourMidLightGrey                  ((Wimp_Colour)3)
+#define Wimp_ColourMidDarkGrey                   ((Wimp_Colour)(1<<2))
+
+/* Wimp_CommandWindowState */
+#define Wimp_CommandWindowOpen                   ((Wimp_CommandWindowState)(1<<1))
+#define Wimp_CommandWindowInactive               ((Wimp_CommandWindowState)0)
+#define Wimp_CommandWindowPending                ((Wimp_CommandWindowState)(1<<0))
+
+/* Wimp_DataRequestFlags */
+#define Wimp_DataRequestClipboard                ((Wimp_DataRequestFlags)(1<<2)) /* send data from clipboard */
+
+/* Wimp_DragBoxFlags */
+#define Wimp_DragBoxClip                         ((Wimp_DragBoxFlags)(1<<1)) /* RISC OS 4+ */
+#define Wimp_DragBoxKeepInLine                   ((Wimp_DragBoxFlags)(1<<0)) /* RISC OS 4+ */
+
+/* Wimp_DragClaimFlags */
+#define Wimp_DragClaimDeleteSource               ((Wimp_DragClaimFlags)(1<<3)) /* source data should be deleted */
+#define Wimp_DragClaimPointerChanged             ((Wimp_DragClaimFlags)(1<<0)) /* pointer shape has been changed */
+#define Wimp_DragClaimSupressDragbox             ((Wimp_DragClaimFlags)(1<<1)) /* remove wimp dragbox */
+
+/* Wimp_DragType */
+#define Wimp_DragSystemPosition                  ((Wimp_DragType)(1<<0))
+#define Wimp_DragStartTextSelection              ((Wimp_DragType)13) /* RISC OS 4.36+ */
+#define Wimp_DragAsmFixedIndefinite              ((Wimp_DragType)10)
+#define Wimp_DragUserRubber                      ((Wimp_DragType)6)
+#define Wimp_DragAsmRubberIndefinite             ((Wimp_DragType)11)
+#define Wimp_DragSystemVScroll                   ((Wimp_DragType)(1<<2))
+#define Wimp_DragSystemScrollBoth                ((Wimp_DragType)12)
+#define Wimp_DragAsmFixed                        ((Wimp_DragType)(1<<3))
+#define Wimp_DragSystemSize                      ((Wimp_DragType)(1<<1))
+#define Wimp_DragAsmRubber                       ((Wimp_DragType)9)
+#define Wimp_DragUserFixed                       ((Wimp_DragType)5)
+#define Wimp_DragUserPoint                       ((Wimp_DragType)7)
+#define Wimp_DragSystemHScroll                   ((Wimp_DragType)3)
+
+/* Wimp_DraggingFlags */
+#define Wimp_DraggingDeleteSource                ((Wimp_DraggingFlags)(1<<3)) /* source data will be deleted */
+#define Wimp_DraggingFromClipboard               ((Wimp_DraggingFlags)(1<<2)) /* sending data from clipboard */
+#define Wimp_DraggingTerminateDrag               ((Wimp_DraggingFlags)(1<<4)) /* drag is terminating - do not claim this message */
+#define Wimp_DraggingFromSelection               ((Wimp_DraggingFlags)(1<<1)) /* sending data from selection */
+
+/* Wimp_ErrorBoxFlags */
+#define Wimp_ErrorBoxGivenCategory               ((Wimp_ErrorBoxFlags)(1<<8))
+#define Wimp_ErrorBoxHighlightCancel             ((Wimp_ErrorBoxFlags)(1<<2))
+#define Wimp_ErrorBoxCancelIcon                  ((Wimp_ErrorBoxFlags)(1<<1))
+#define Wimp_ErrorBoxCategoryInfo                ((Wimp_ErrorBoxFlags)(1<<0))
+#define Wimp_ErrorBoxNoPrompt                    ((Wimp_ErrorBoxFlags)(1<<3))
+#define Wimp_ErrorBoxCategory                    ((Wimp_ErrorBoxFlags)3584)
+#define Wimp_ErrorBoxCategoryProgram             ((Wimp_ErrorBoxFlags)3)
+#define Wimp_ErrorBoxClose                       ((Wimp_ErrorBoxFlags)(1<<6))
+#define Wimp_ErrorBoxShortTitle                  ((Wimp_ErrorBoxFlags)(1<<4))
+#define Wimp_ErrorBoxCategoryQuestion            ((Wimp_ErrorBoxFlags)(1<<2))
+#define Wimp_ErrorBoxOKIcon                      ((Wimp_ErrorBoxFlags)(1<<0))
+#define Wimp_ErrorBoxCategoryError               ((Wimp_ErrorBoxFlags)(1<<1))
+#define Wimp_ErrorBoxLeaveOpen                   ((Wimp_ErrorBoxFlags)(1<<5))
+#define Wimp_ErrorBoxNoBeep                      ((Wimp_ErrorBoxFlags)(1<<7))
+
+/* Wimp_ErrorBoxSelection */
+#define Wimp_ErrorBoxSelectedCancel              ((Wimp_ErrorBoxSelection)(1<<1))
+#define Wimp_ErrorBoxSelectedOK                  ((Wimp_ErrorBoxSelection)(1<<0))
+#define Wimp_ErrorBoxSelectedNothing             ((Wimp_ErrorBoxSelection)0)
+
+/* Wimp_EventNo */
+#define Wimp_PollwordNonZero                     ((Wimp_EventNo)13)
+#define Wimp_GainCaret                           ((Wimp_EventNo)12)
+#define Wimp_KeyPressed                          ((Wimp_EventNo)(1<<3))
+#define Wimp_ScrollRequest                       ((Wimp_EventNo)10)
+#define Wimp_UserMessageRecorded                 ((Wimp_EventNo)18)
+#define Wimp_PointerEnteringWindow               ((Wimp_EventNo)5)
+#define Wimp_UserMessage                         ((Wimp_EventNo)17)
+#define Wimp_MenuSelection                       ((Wimp_EventNo)9)
+#define Wimp_MouseClick                          ((Wimp_EventNo)6)
+#define Wimp_LoseCaret                           ((Wimp_EventNo)11)
+#define Wimp_UserMessageAcknowledge              ((Wimp_EventNo)19)
+#define Wimp_NullReasonCode                      ((Wimp_EventNo)0)
+#define Wimp_RedrawWindowRequest                 ((Wimp_EventNo)(1<<0))
+#define Wimp_OpenWindowRequest                   ((Wimp_EventNo)(1<<1))
+#define Wimp_UserDragBox                         ((Wimp_EventNo)7)
+#define Wimp_PointerLeavingWindow                ((Wimp_EventNo)(1<<2))
+#define Wimp_CloseWindowRequest                  ((Wimp_EventNo)3)
+
+/* Wimp_ExtraWindowFlags */
+#define Wimp_WindowUseTitleValidationColours     ((Wimp_ExtraWindowFlags)(1<<0)) /* RISC OS 4+ Prefer Wimp_WindowUseTitleValidationString */
+#define Wimp_WindowAlways3D                      ((Wimp_ExtraWindowFlags)(1<<3)) /* RISC OS 4+ */
+#define Wimp_WindowUseTitleValidationString      ((Wimp_ExtraWindowFlags)(1<<0)) /* RISC OS 4+ */
+#define Wimp_WindowUseExtendedScrollRequest      ((Wimp_ExtraWindowFlags)(1<<1)) /* RISC OS 4.32+ */
+#define Wimp_WindowGiveShadedIconInfo            ((Wimp_ExtraWindowFlags)(1<<4)) /* RISC OS 5+ */
+#define Wimp_WindowNever3D                       ((Wimp_ExtraWindowFlags)(1<<2)) /* RISC OS 4+ */
+
+/* Wimp_FilterAction */
+#define Wimp_FilterPrePoll                       ((Wimp_FilterAction)0) /* called on entry to Wimp_Poll */
+#define Wimp_FilterPostPoll                      ((Wimp_FilterAction)1) /* called on exit from Wimp_Poll */
+#define Wimp_FilterPostRect                      ((Wimp_FilterAction)4) /* called on exit from Wimp_GetRectangle */
+#define Wimp_FilterRect                          ((Wimp_FilterAction)3) /* called on entry to Wimp_GetRectangle */
+#define Wimp_FilterPostIcon                      ((Wimp_FilterAction)5) /* called after plotting icons in Wimp_GetRectangle */
+#define Wimp_FilterCopy                          ((Wimp_FilterAction)2) /* called on entry to Wimp_BlockCopy and similar internal operations */
+
+/* Wimp_Furniture */
+#define Wimp_FurnitureSize                       ((Wimp_Furniture)6)
+#define Wimp_FurnitureWhole                      ((Wimp_Furniture)0)
+#define Wimp_FurnitureBack                       ((Wimp_Furniture)(1<<0))
+#define Wimp_FurnitureVScroll                    ((Wimp_Furniture)5)
+#define Wimp_FurnitureTitle                      ((Wimp_Furniture)3)
+#define Wimp_FurnitureClose                      ((Wimp_Furniture)(1<<1))
+#define Wimp_FurnitureToggle                     ((Wimp_Furniture)(1<<2))
+#define Wimp_FurnitureIconise                    ((Wimp_Furniture)(1<<3))
+#define Wimp_FurnitureHScroll                    ((Wimp_Furniture)7)
+
+/* Wimp_I */
+#define Wimp_IconSize                            ((Wimp_I)-9)
+#define Wimp_IconScrollUp                        ((Wimp_I)-6)
+#define Wimp_IconScrollDown                      ((Wimp_I)-8)
+#define Wimp_IconTitle                           ((Wimp_I)-4)
+#define Wimp_IconWindow                          ((Wimp_I)-1)
+#define Wimp_IconScrollRight                     ((Wimp_I)-12)
+#define Wimp_IconClose                           ((Wimp_I)-3)
+#define Wimp_IconScrollLeft                      ((Wimp_I)-10)
+#define Wimp_IconToggle                          ((Wimp_I)-5)
+#define Wimp_IconFrame                           ((Wimp_I)-13)
+#define Wimp_IconHScroll                         ((Wimp_I)-11)
+#define Wimp_IconBack                            ((Wimp_I)-2)
+#define Wimp_IconVScroll                         ((Wimp_I)-7)
+#define Wimp_IconIconise                         ((Wimp_I)-14) /* RISC OS 4+ */
+
+/* Wimp_IconFlags */
+#define Wimp_ButtonMenuIcon                      ((Wimp_IconFlags)9) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconBorder                          ((Wimp_IconFlags)(1<<2))
+#define Wimp_ButtonClick                         ((Wimp_IconFlags)3) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconNeedsHelp                       ((Wimp_IconFlags)(1<<7))
+#define Wimp_ButtonRadio                         ((Wimp_IconFlags)11) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconDeleted                         ((Wimp_IconFlags)0x800000)
+#define Wimp_ButtonAlways                        ((Wimp_IconFlags)(1<<0)) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconIndirected                      ((Wimp_IconFlags)(1<<8))
+#define Wimp_IconFontHandle                      ((Wimp_IconFlags)0xff000000) /* shift Font Handle bits by Wimp_IconFontHandleShift */
+#define Wimp_IconRJustified                      ((Wimp_IconFlags)(1<<9))
+#define Wimp_ButtonDoubleClick                   ((Wimp_IconFlags)5) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_ButtonDoubleClickDrag               ((Wimp_IconFlags)10) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconNumeric                         ((Wimp_IconFlags)0x100000)
+#define Wimp_ButtonClickDrag                     ((Wimp_IconFlags)6) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_ButtonRelease                       ((Wimp_IconFlags)(1<<2)) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconVCentred                        ((Wimp_IconFlags)(1<<4))
+#define Wimp_IconButtonType                      ((Wimp_IconFlags)61440) /* shift button bits by Wimp_IconButtonTypeShift */
+#define Wimp_IconFGColour                        ((Wimp_IconFlags)0xf000000) /* shift FG Colour bits by Wimp_IconFGColourShift */
+#define Wimp_IconHalfSize                        ((Wimp_IconFlags)(1<<11))
+#define Wimp_IconFilled                          ((Wimp_IconFlags)(1<<5))
+#define Wimp_ButtonDoubleDrag                    ((Wimp_IconFlags)(1<<3)) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconHCentred                        ((Wimp_IconFlags)(1<<3))
+#define Wimp_ButtonRepeat                        ((Wimp_IconFlags)(1<<1)) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconText                            ((Wimp_IconFlags)(1<<0))
+#define Wimp_IconAntiAliased                     ((Wimp_IconFlags)(1<<6))
+#define Wimp_IconAllowAdjust                     ((Wimp_IconFlags)(1<<10))
+#define Wimp_IconSelected                        ((Wimp_IconFlags)0x200000)
+#define Wimp_IconESG                             ((Wimp_IconFlags)0xf0000) /* shift ESG bits by Wimp_IconESGShift */
+#define Wimp_IconBGColour                        ((Wimp_IconFlags)0xf0000000) /* shift BG Colour bits by Wimp_IconBGColourShift */
+#define Wimp_ButtonWritable                      ((Wimp_IconFlags)15) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconShaded                          ((Wimp_IconFlags)0x400000)
+#define Wimp_ButtonNever                         ((Wimp_IconFlags)0) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_ButtonReleaseDrag                   ((Wimp_IconFlags)7) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_ButtonWriteClickDrag                ((Wimp_IconFlags)14) /* shift by Wimp_IconButtonTypeShift */
+#define Wimp_IconSprite                          ((Wimp_IconFlags)(1<<1))
+
+/* Wimp_IconiseFlags */
+#define Wimp_IconiseWithShiftClose               ((Wimp_IconiseFlags)(1<<0))
+
+/* Wimp_KeyNo */
+#define Wimp_KeyPageUp                           ((Wimp_KeyNo)415)
+#define Wimp_KeyCopy                             ((Wimp_KeyNo)395)
+#define Wimp_KeyUp                               ((Wimp_KeyNo)399)
+#define Wimp_KeyDown                             ((Wimp_KeyNo)398)
+#define Wimp_KeyLogo                             ((Wimp_KeyNo)448)
+#define Wimp_KeyPageDown                         ((Wimp_KeyNo)414)
+#define Wimp_KeyShift                            ((Wimp_KeyNo)16)
+#define Wimp_KeyMenu                             ((Wimp_KeyNo)449)
+#define Wimp_KeyPrint                            ((Wimp_KeyNo)384)
+#define Wimp_KeyEscape                           ((Wimp_KeyNo)27)
+#define Wimp_KeyBackspace                        ((Wimp_KeyNo)(1<<3))
+#define Wimp_KeyDelete                           ((Wimp_KeyNo)127)
+#define Wimp_KeyF5                               ((Wimp_KeyNo)389)
+#define Wimp_KeyRight                            ((Wimp_KeyNo)397)
+#define Wimp_KeyTab                              ((Wimp_KeyNo)394)
+#define Wimp_KeyF12                              ((Wimp_KeyNo)460)
+#define Wimp_KeyF11                              ((Wimp_KeyNo)459)
+#define Wimp_KeyF10                              ((Wimp_KeyNo)458)
+#define Wimp_KeyLeft                             ((Wimp_KeyNo)396)
+#define Wimp_KeyHome                             ((Wimp_KeyNo)30)
+#define Wimp_KeyReturn                           ((Wimp_KeyNo)13)
+#define Wimp_KeyControl                          ((Wimp_KeyNo)(1<<5))
+#define Wimp_KeyF9                               ((Wimp_KeyNo)393)
+#define Wimp_KeyF8                               ((Wimp_KeyNo)392)
+#define Wimp_KeyF7                               ((Wimp_KeyNo)391)
+#define Wimp_KeyF6                               ((Wimp_KeyNo)390)
+#define Wimp_KeyInsert                           ((Wimp_KeyNo)461)
+#define Wimp_KeyF4                               ((Wimp_KeyNo)388)
+#define Wimp_KeyF3                               ((Wimp_KeyNo)387)
+#define Wimp_KeyF2                               ((Wimp_KeyNo)386)
+#define Wimp_KeyF1                               ((Wimp_KeyNo)385)
+
+/* Wimp_MenuFlags */
+#define Wimp_MenuTicked                          ((Wimp_MenuFlags)(1<<0))
+#define Wimp_MenuSeparate                        ((Wimp_MenuFlags)(1<<1))
+#define Wimp_MenuWritable                        ((Wimp_MenuFlags)(1<<2))
+#define Wimp_MenuLast                            ((Wimp_MenuFlags)(1<<7))
+#define Wimp_MenuGiveWarning                     ((Wimp_MenuFlags)(1<<3))
+#define Wimp_MenuSubMenuWhenShaded               ((Wimp_MenuFlags)(1<<4))
+#define Wimp_MenuTitleIndirected                 ((Wimp_MenuFlags)(1<<8))
+
+/* Wimp_MenuStateFlags */
+#define Wimp_GivenWindowAndIcon                  ((Wimp_MenuStateFlags)(1<<0))
+
+/* Wimp_MouseState */
+#define Wimp_ClickMenu                           ((Wimp_MouseState)(1<<1))
+#define Wimp_ClickAdjust                         ((Wimp_MouseState)(1<<0))
+#define Wimp_DragAdjust                          ((Wimp_MouseState)(1<<4))
+#define Wimp_ClickSelect                         ((Wimp_MouseState)(1<<2))
+#define Wimp_DoubleAdjust                        ((Wimp_MouseState)(1<<0))
+#define Wimp_SingleAdjust                        ((Wimp_MouseState)(1<<8))
+#define Wimp_DragSelect                          ((Wimp_MouseState)(1<<6))
+#define Wimp_DoubleSelect                        ((Wimp_MouseState)(1<<2))
+#define Wimp_SingleSelect                        ((Wimp_MouseState)(1<<10))
+
+/* Wimp_PlotIcon */
+#define Wimp_PlotIconGivenSpriteArea             ((uint32_t)(1<<0))
+#define Wimp_PlotIconUnderPointer                ((uint32_t)(1<<1))
+
+/* Wimp_PollFlags */
+#define Wimp_IssuePoll14And15                    ((Wimp_PollFlags)0x2000000) /* RISC OS 4 S4, RISC OS 6 */
+#define Wimp_QueueKey                            ((Wimp_PollFlags)(1<<8))
+#define Wimp_MaskNull                            ((Wimp_PollFlags)(1<<0))
+#define Wimp_MaskIconEntering                    ((Wimp_PollFlags)(1<<15)) /* RISC OS 4 S4, RISC OS 6 */
+#define Wimp_QueueMouse                          ((Wimp_PollFlags)(1<<6))
+#define Wimp_GivenPollword                       ((Wimp_PollFlags)0x400000)
+#define Wimp_MaskEntering                        ((Wimp_PollFlags)(1<<5))
+#define Wimp_MaskLeaving                         ((Wimp_PollFlags)(1<<4))
+#define Wimp_SaveFP                              ((Wimp_PollFlags)0x1000000)
+#define Wimp_MaskMessage                         ((Wimp_PollFlags)0x20000)
+#define Wimp_MaskPollword                        ((Wimp_PollFlags)(1<<13))
+#define Wimp_MaskRecorded                        ((Wimp_PollFlags)0x40000)
+#define Wimp_PollHighPriority                    ((Wimp_PollFlags)0x800000)
+#define Wimp_QueueRedraw                         ((Wimp_PollFlags)(1<<1))
+#define Wimp_MaskIconLeaving                     ((Wimp_PollFlags)(1<<14)) /* RISC OS 4 S4, RISC OS 6 */
+#define Wimp_MaskLose                            ((Wimp_PollFlags)(1<<11))
+#define Wimp_MaskAcknowledge                     ((Wimp_PollFlags)0x80000)
+#define Wimp_MaskGain                            ((Wimp_PollFlags)(1<<12))
+
+/* Wimp_PreQuitFlags */
+#define Wimp_PreQuitTaskOnly                     ((Wimp_PreQuitFlags)(1<<0))
+
+/* Wimp_Priority */
+#define Wimp_PriorityADFSFilerHardDiscs          ((Wimp_Priority)0x70000000)
+#define Wimp_PriorityNetFiler                    ((Wimp_Priority)0x20000000)
+#define Wimp_PriorityPaletteUtility              ((Wimp_Priority)0x20000000)
+#define Wimp_PriorityPrinters                    ((Wimp_Priority)0xf000000)
+#define Wimp_PriorityResourceFiler               ((Wimp_Priority)0x50000000)
+#define Wimp_PriorityTinyDirs                    ((Wimp_Priority)0xc0000000)
+#define Wimp_PriorityNFSFiler                    ((Wimp_Priority)0x30000000)
+#define Wimp_PriorityRAMFSFiler                  ((Wimp_Priority)0x40000000)
+#define Wimp_PriorityADFSFilerFloppyDiscs        ((Wimp_Priority)0x60000000)
+#define Wimp_PriorityTaskManager                 ((Wimp_Priority)0x60000000)
+
+/* Wimp_ReleaseFlags */
+#define Wimp_ReleaseClipboard                    ((Wimp_ReleaseFlags)(1<<2)) /* clipboard being released */
+
+/* Wimp_ScreenEdgeNotificationFlags */
+#define Wimp_ScreenEdgeNotificationBottom        ((Wimp_ScreenEdgeNotificationFlags)(1<<1))
+#define Wimp_ScreenEdgeNotificationLeft          ((Wimp_ScreenEdgeNotificationFlags)(1<<0))
+#define Wimp_ScreenEdgeNotificationRight         ((Wimp_ScreenEdgeNotificationFlags)(1<<2))
+#define Wimp_ScreenEdgeNotificationTop           ((Wimp_ScreenEdgeNotificationFlags)(1<<3))
+
+/* Wimp_ScrollDirection */
+#define Wimp_ScrollAutoLeft                      ((Wimp_ScrollDirection)-3) /* RISC OS 4+ */
+#define Wimp_ScrollPageLeft                      ((Wimp_ScrollDirection)-2)
+#define Wimp_ScrollDoubleExtendedLeft            ((Wimp_ScrollDirection)-8) /* RISC OS 4.32+ */
+#define Wimp_ScrollPageUp                        ((Wimp_ScrollDirection)(1<<1))
+#define Wimp_ScrollAutoUp                        ((Wimp_ScrollDirection)3) /* RISC OS 4+ */
+#define Wimp_ScrollDoubleExtendedDown            ((Wimp_ScrollDirection)-8) /* RISC OS 4.32+ */
+#define Wimp_ScrollColumnLeft                    ((Wimp_ScrollDirection)-1)
+#define Wimp_ScrollAutoRight                     ((Wimp_ScrollDirection)3) /* RISC OS 4+ */
+#define Wimp_ScrollColumnRight                   ((Wimp_ScrollDirection)(1<<0))
+#define Wimp_ScrollAutoDown                      ((Wimp_ScrollDirection)-3) /* RISC OS 4+ */
+#define Wimp_ScrollLineDown                      ((Wimp_ScrollDirection)-1)
+#define Wimp_ScrollNone                          ((Wimp_ScrollDirection)0)
+#define Wimp_ScrollDoubleExtendedRight           ((Wimp_ScrollDirection)(1<<3)) /* RISC OS 4.32+ */
+#define Wimp_ScrollSingleExtendedUp              ((Wimp_ScrollDirection)(1<<2)) /* RISC OS 4.32+ */
+#define Wimp_ScrollLineUp                        ((Wimp_ScrollDirection)(1<<0))
+#define Wimp_ScrollSingleExtendedDown            ((Wimp_ScrollDirection)-4) /* RISC OS 4.32+ */
+#define Wimp_ScrollSingleExtendedLeft            ((Wimp_ScrollDirection)-4) /* RISC OS 4.32+ */
+#define Wimp_ScrollDoubleExtendedUp              ((Wimp_ScrollDirection)(1<<3)) /* RISC OS 4.32+ */
+#define Wimp_ScrollPageDown                      ((Wimp_ScrollDirection)-2)
+#define Wimp_ScrollPageRight                     ((Wimp_ScrollDirection)(1<<1))
+#define Wimp_ScrollSingleExtendedRight           ((Wimp_ScrollDirection)(1<<2)) /* RISC OS 4.32+ */
+
+/* Wimp_T */
+#define Wimp_Broadcast                           ((Wimp_T)0)
+
+/* Wimp_ToggleBackdropFlags */
+#define Wimp_ToggleBackdropToBack                ((Wimp_ToggleBackdropFlags)(1<<1))
+#define Wimp_ToggleBackdrop                      ((Wimp_ToggleBackdropFlags)0)
+#define Wimp_ToggleBackdropToFront               ((Wimp_ToggleBackdropFlags)(1<<0))
+#define Wimp_ToggleBackdropGetPosition           ((Wimp_ToggleBackdropFlags)3)
+#define Wimp_ToggleBackdropType                  ((Wimp_ToggleBackdropFlags)3)
+
+/* Wimp_VersionNo */
+#define Wimp_VersionRO2                          ((Wimp_VersionNo)200)
+#define Wimp_VersionRO3                          ((Wimp_VersionNo)310)
+#define Wimp_VersionRO38                         ((Wimp_VersionNo)380) /* Introduces nested windows (standard in RISC OS 4+) */
+#define Wimp_VersionRO40                         ((Wimp_VersionNo)400)
+#define Wimp_VersionRO36                         ((Wimp_VersionNo)360)
+#define Wimp_VersionRO37                         ((Wimp_VersionNo)370)
+#define Wimp_VersionRO35                         ((Wimp_VersionNo)350)
+#define Wimp_VersionRO30                         ((Wimp_VersionNo)300)
+
+/* Wimp_W */
+#define Wimp_Background                          ((Wimp_W)-1)
+#define Wimp_IconBarLeftHighPriority             ((Wimp_W)-5)
+#define Wimp_IconBarRightLowPriority             ((Wimp_W)-7)
+#define Wimp_IconBarRightRelative                ((Wimp_W)-4)
+#define Wimp_IconBarLeftLowPriority              ((Wimp_W)-6)
+#define Wimp_IconBarRight                        ((Wimp_W)-1)
+#define Wimp_NoIcon                              ((Wimp_W)-1)
+#define Wimp_IconBarLeft                         ((Wimp_W)-2)
+#define Wimp_IconBar                             ((Wimp_W)-2)
+#define Wimp_Top                                 ((Wimp_W)-1)
+#define Wimp_Bottom                              ((Wimp_W)-2)
+#define Wimp_IconBarLeftRelative                 ((Wimp_W)-3)
+#define Wimp_Hidden                              ((Wimp_W)-3)
+#define Wimp_IconBarRightHighPriority            ((Wimp_W)-8)
+
+/* Wimp_WindowFlags */
+#define Wimp_WindowCloseIcon                     ((Wimp_WindowFlags)0x2000000)
+#define Wimp_WindowVScroll                       ((Wimp_WindowFlags)0x10000000)
+#define Wimp_WindowHasFocus                      ((Wimp_WindowFlags)0x100000)
+#define Wimp_WindowAutoRedraw                    ((Wimp_WindowFlags)(1<<4))
+#define Wimp_WindowBack                          ((Wimp_WindowFlags)(1<<11))
+#define Wimp_WindowForegroundWindow              ((Wimp_WindowFlags)0x800000) /* RISC OS 4+ */
+#define Wimp_WindowBackIcon                      ((Wimp_WindowFlags)0x1000000)
+#define Wimp_WindowPartialSize                   ((Wimp_WindowFlags)0x400000) /* Window at full size, not obscuring iconbar - WindowManager 3.98+ */
+#define Wimp_WindowScrollRepeat                  ((Wimp_WindowFlags)(1<<8))
+#define Wimp_WindowIgnoreXExtent                 ((Wimp_WindowFlags)(1<<14))
+#define Wimp_WindowHotKeys                       ((Wimp_WindowFlags)(1<<12))
+#define Wimp_WindowFurnitureWindow               ((Wimp_WindowFlags)0x800000) /* WindowManager 3.98+ */
+#define Wimp_WindowRealColours                   ((Wimp_WindowFlags)(1<<10)) /* Not RISC OS 4+ */
+#define Wimp_WindowToggleIcon                    ((Wimp_WindowFlags)0x8000000)
+#define Wimp_WindowTitleIcon                     ((Wimp_WindowFlags)0x4000000)
+#define Wimp_WindowIgnoreYExtent                 ((Wimp_WindowFlags)(1<<15))
+#define Wimp_WindowNewFormat                     ((Wimp_WindowFlags)0x80000000)
+#define Wimp_WindowSizeIcon                      ((Wimp_WindowFlags)0x20000000)
+#define Wimp_WindowBoundedOnce                   ((Wimp_WindowFlags)0x200000)
+#define Wimp_WindowScroll                        ((Wimp_WindowFlags)(1<<9))
+#define Wimp_WindowPane                          ((Wimp_WindowFlags)(1<<5))
+#define Wimp_WindowFullSize                      ((Wimp_WindowFlags)0x40000) /* Window at full size, obscuring Iconbar */
+#define Wimp_WindowHScroll                       ((Wimp_WindowFlags)0x40000000)
+#define Wimp_WindowMoveable                      ((Wimp_WindowFlags)(1<<1))
+#define Wimp_WindowBounded                       ((Wimp_WindowFlags)(1<<13))
+#define Wimp_WindowToggled                       ((Wimp_WindowFlags)0x80000)
+#define Wimp_WindowNoBounds                      ((Wimp_WindowFlags)(1<<6))
+#define Wimp_WindowNotCovered                    ((Wimp_WindowFlags)0x20000)
+#define Wimp_WindowOpen                          ((Wimp_WindowFlags)0x10000)
+
+/* Wimp_WindowNestingFlags */
+#define Wimp_ChildLinksParentVisibleBottomOrLeft ((Wimp_WindowNestingFlags)(1<<0)) /* link to left / bottom of visible area of parent */
+#define Wimp_ChildLinksParentWorkArea            ((Wimp_WindowNestingFlags)0) /* link to work area of parent */
+#define Wimp_ChildLinksParentVisibleTopOrRight   ((Wimp_WindowNestingFlags)(1<<1)) /* link to right / top of visible area of parent */
+#define Wimp_ChildLinksParent                    ((Wimp_WindowNestingFlags)3)
+
+
+
+/* Types */
+
+typedef uint32_t WimpTextOp_PaintFlags;
+
+typedef uint32_t WimpTextOp_StringWidthFlags;
+
+typedef uint32_t Wimp_AppControlFlags;
+
+typedef int32_t Wimp_AppControlOperation;
+
+typedef uint32_t Wimp_AutoScrollFlags;
+
+typedef void * Wimp_W;
+
+struct OS_Box_s {
+    int32_t x0;
+    int32_t y0;
+    int32_t x1;
+    int32_t y1;
+};
+typedef struct OS_Box_s OS_Box;
+
+struct Wimp_AutoScrollInfo_s {
+    Wimp_W w;
+    OS_Box pause_zone_sizes;
+    int32_t pause_duration;
+    void * state_change;
+    void * handle;
+};
+typedef struct Wimp_AutoScrollInfo_s Wimp_AutoScrollInfo;
+
+struct Wimp_Draw_s {
+    Wimp_W w;
+    OS_Box box;
+    int32_t xscroll;
+    int32_t yscroll;
+    OS_Box clip;
+};
+typedef struct Wimp_Draw_s Wimp_Draw;
+
+struct Wimp_Open_s {
+    Wimp_W w;
+    OS_Box visible;
+    int32_t xscroll;
+    int32_t yscroll;
+    Wimp_W next;
+};
+typedef struct Wimp_Open_s Wimp_Open;
+
+struct Wimp_Close_s {
+    Wimp_W w;
+};
+typedef struct Wimp_Close_s Wimp_Close;
+
+struct Wimp_Leaving_s {
+    Wimp_W w;
+};
+typedef struct Wimp_Leaving_s Wimp_Leaving;
+
+struct Wimp_Entering_s {
+    Wimp_W w;
+};
+typedef struct Wimp_Entering_s Wimp_Entering;
+
+struct OS_Coord_s {
+    int32_t x;
+    int32_t y;
+};
+typedef struct OS_Coord_s OS_Coord;
+
+typedef uint32_t Wimp_MouseState;
+
+typedef int32_t Wimp_I;
+
+struct Wimp_Pointer_s {
+    OS_Coord pos;
+    Wimp_MouseState buttons;
+    Wimp_W w;
+    Wimp_I i;
+};
+typedef struct Wimp_Pointer_s Wimp_Pointer;
+
+struct Wimp_Dragged_s {
+    OS_Box final;
+};
+typedef struct Wimp_Dragged_s Wimp_Dragged;
+
+typedef int32_t Wimp_KeyNo;
+
+struct Wimp_Key_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    int32_t height;
+    int32_t index;
+    Wimp_KeyNo c;
+};
+typedef struct Wimp_Key_s Wimp_Key;
+
+struct Wimp_Selection_s {
+    int32_t items[9];
+};
+typedef struct Wimp_Selection_s Wimp_Selection;
+
+typedef int32_t Wimp_ScrollDirection;
+
+struct Wimp_Scroll_s {
+    Wimp_W w;
+    OS_Box visible;
+    int32_t xscroll;
+    int32_t yscroll;
+    Wimp_W next;
+    Wimp_ScrollDirection xmin;
+    Wimp_ScrollDirection ymin;
+    Wimp_I i;
+};
+typedef struct Wimp_Scroll_s Wimp_Scroll;
+
+struct Wimp_Caret_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    int32_t height;
+    int32_t index;
+};
+typedef struct Wimp_Caret_s Wimp_Caret;
+
+struct Wimp_Pollword_s {
+    void * addr;
+    int32_t word;
+};
+typedef struct Wimp_Pollword_s Wimp_Pollword;
+
+struct Wimp_MessageDataXfer_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    int32_t est_size;
+    uint32_t file_type;
+    uint8_t file_name[212];
+};
+typedef struct Wimp_MessageDataXfer_s Wimp_MessageDataXfer;
+
+struct Wimp_MessageRAMXfer_s {
+    void * addr;
+    int32_t size;
+};
+typedef struct Wimp_MessageRAMXfer_s Wimp_MessageRAMXfer;
+
+typedef uint32_t Wimp_PreQuitFlags;
+
+struct Wimp_MessagePrequit_s {
+    Wimp_PreQuitFlags flags;
+};
+typedef struct Wimp_MessagePrequit_s Wimp_MessagePrequit;
+
+typedef uint8_t OS_F;
+
+typedef uint32_t Wimp_SaveDesktopFlags;
+
+struct Wimp_MessageSaveDesktop_s {
+    OS_F file;
+    uint8_t reserved[3];
+    Wimp_SaveDesktopFlags flags;
+};
+typedef struct Wimp_MessageSaveDesktop_s Wimp_MessageSaveDesktop;
+
+typedef uint32_t OS_FW;
+
+struct Wimp_MessageSaveDesktopW_s {
+    OS_FW file;
+    Wimp_SaveDesktopFlags flags;
+};
+typedef struct Wimp_MessageSaveDesktopW_s Wimp_MessageSaveDesktopW;
+
+struct Wimp_MessageDevice_s {
+    int32_t major;
+    int32_t minor;
+    uint8_t info[228];
+};
+typedef struct Wimp_MessageDevice_s Wimp_MessageDevice;
+
+struct Wimp_MessageDataSaved_s {
+    int32_t ref;
+};
+typedef struct Wimp_MessageDataSaved_s Wimp_MessageDataSaved;
+
+typedef uint32_t Wimp_ShutdownFlags;
+
+struct Wimp_MessageShutdown_s {
+    Wimp_ShutdownFlags flags;
+};
+typedef struct Wimp_MessageShutdown_s Wimp_MessageShutdown;
+
+typedef uint32_t Wimp_ClaimFlags;
+
+struct Wimp_MessageClaimEntity_s {
+    Wimp_ClaimFlags flags;
+};
+typedef struct Wimp_MessageClaimEntity_s Wimp_MessageClaimEntity;
+
+typedef uint32_t Wimp_DataRequestFlags;
+
+struct Wimp_MessageDataRequest_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    Wimp_DataRequestFlags flags;
+    uint32_t file_types[54];
+};
+typedef struct Wimp_MessageDataRequest_s Wimp_MessageDataRequest;
+
+typedef uint32_t Wimp_DraggingFlags;
+
+struct Wimp_MessageDragging_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    Wimp_DraggingFlags flags;
+    OS_Box box;
+    uint32_t file_types[50];
+};
+typedef struct Wimp_MessageDragging_s Wimp_MessageDragging;
+
+typedef uint32_t Wimp_DragClaimFlags;
+
+struct Wimp_MessageDragClaim_s {
+    Wimp_DragClaimFlags flags;
+    uint32_t file_types[58];
+};
+typedef struct Wimp_MessageDragClaim_s Wimp_MessageDragClaim;
+
+typedef uint32_t Wimp_ReleaseFlags;
+
+struct Wimp_MessageReleaseEntity_s {
+    Wimp_ReleaseFlags flags;
+};
+typedef struct Wimp_MessageReleaseEntity_s Wimp_MessageReleaseEntity;
+
+struct Wimp_MessageAppControl_s {
+    int32_t protocol_version;
+    Wimp_AppControlFlags flags;
+    Wimp_AppControlOperation operation;
+};
+typedef struct Wimp_MessageAppControl_s Wimp_MessageAppControl;
+
+struct Wimp_Message_s {
+    union {
+        Wimp_MessageDataXfer data_xfer;
+        Wimp_MessageRAMXfer ram_xfer;
+        Wimp_MessagePrequit prequit;
+        Wimp_MessageSaveDesktop save_desktop;
+        Wimp_MessageSaveDesktopW save_desktopw;
+        Wimp_MessageDevice device;
+        Wimp_MessageDataSaved data_saved;
+        Wimp_MessageShutdown shutdown;
+        Wimp_MessageClaimEntity claim_entity;
+        Wimp_MessageDataRequest data_request;
+        Wimp_MessageDragging dragging;
+        Wimp_MessageDragClaim drag_claim;
+        Wimp_MessageReleaseEntity release_entity;
+        Wimp_MessageAppControl app_control;
+        uint8_t reserved[236];
+    } data;
+};
+typedef struct Wimp_Message_s Wimp_Message;
+
+typedef union Wimp_Block_u {
+    Wimp_Draw redraw;
+    Wimp_Open open;
+    Wimp_Close close;
+    Wimp_Leaving leaving;
+    Wimp_Entering entering;
+    Wimp_Pointer pointer;
+    Wimp_Dragged dragged;
+    Wimp_Key key;
+    Wimp_Selection selection;
+    Wimp_Scroll scroll;
+    Wimp_Caret caret;
+    Wimp_Pollword pollword;
+    Wimp_Message message;
+    uint8_t reserved[256];
+} Wimp_Block;
+
+typedef uint8_t Wimp_Colour;
+
+typedef int32_t Wimp_CommandWindowState;
+
+typedef int32_t Wimp_DragType;
+
+struct Wimp_Drag_s {
+    Wimp_W w;
+    Wimp_DragType type;
+    OS_Box initial;
+    OS_Box bbox;
+    void * handle;
+    void * draw;
+    void * undraw;
+    void * redraw;
+};
+typedef struct Wimp_Drag_s Wimp_Drag;
+
+typedef uint32_t Wimp_DragBoxFlags;
+
+typedef uint32_t Wimp_ErrorBoxFlags;
+
+typedef int32_t Wimp_ErrorBoxSelection;
+
+typedef int32_t Wimp_EventNo;
+
+typedef uint8_t Wimp_ExtraWindowFlags;
+
+typedef int32_t Wimp_FilterAction;
+
+struct Wimp_FullMessageAppControl_s {
+    int32_t protocol_version;
+    Wimp_AppControlFlags flags;
+    Wimp_AppControlOperation operation;
+};
+typedef struct Wimp_FullMessageAppControl_s Wimp_FullMessageAppControl;
+
+struct Wimp_FullMessageClaimEntity_s {
+    Wimp_ClaimFlags flags;
+};
+typedef struct Wimp_FullMessageClaimEntity_s Wimp_FullMessageClaimEntity;
+
+struct Wimp_FullMessageDataRequest_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    Wimp_DataRequestFlags flags;
+    uint32_t file_types[54];
+};
+typedef struct Wimp_FullMessageDataRequest_s Wimp_FullMessageDataRequest;
+
+struct Wimp_FullMessageDataSaved_s {
+    int32_t ref;
+};
+typedef struct Wimp_FullMessageDataSaved_s Wimp_FullMessageDataSaved;
+
+struct Wimp_FullMessageDataXfer_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    int32_t est_size;
+    uint32_t file_type;
+    uint8_t file_name[212];
+};
+typedef struct Wimp_FullMessageDataXfer_s Wimp_FullMessageDataXfer;
+
+struct Wimp_FullMessageDevice_s {
+    int32_t major;
+    int32_t minor;
+    uint8_t info[228];
+};
+typedef struct Wimp_FullMessageDevice_s Wimp_FullMessageDevice;
+
+struct Wimp_FullMessageDragClaim_s {
+    Wimp_DragClaimFlags flags;
+    uint32_t file_types[58];
+};
+typedef struct Wimp_FullMessageDragClaim_s Wimp_FullMessageDragClaim;
+
+struct Wimp_FullMessageDragging_s {
+    Wimp_W w;
+    Wimp_I i;
+    OS_Coord pos;
+    Wimp_DraggingFlags flags;
+    OS_Box box;
+    uint32_t file_types[50];
+};
+typedef struct Wimp_FullMessageDragging_s Wimp_FullMessageDragging;
+
+typedef uint8_t Font_F;
+
+struct Wimp_FullMessageFontChanged_s {
+    Font_F font;
+};
+typedef struct Wimp_FullMessageFontChanged_s Wimp_FullMessageFontChanged;
+
+typedef void * Wimp_T;
+
+struct Wimp_FullMessageIconise_s {
+    Wimp_W w;
+    Wimp_T task;
+    uint8_t title[20];
+};
+typedef struct Wimp_FullMessageIconise_s Wimp_FullMessageIconise;
+
+typedef uint32_t Wimp_IconiseFlags;
+
+struct Wimp_FullMessageIconiseAt_s {
+    Wimp_W w;
+    Wimp_T task;
+    OS_Coord at;
+    Wimp_IconiseFlags flags;
+};
+typedef struct Wimp_FullMessageIconiseAt_s Wimp_FullMessageIconiseAt;
+
+typedef uint32_t Wimp_MenuFlags;
+
+typedef uint32_t Wimp_IconFlags;
+
+typedef void * OSSpriteOp_Id;
+
+struct OSSpriteOp_Area_s {
+    int32_t size;
+    int32_t sprite_count;
+    int32_t first;
+    int32_t used;
+};
+typedef struct OSSpriteOp_Area_s OSSpriteOp_Area;
+
+typedef union Wimp_IconData_u {
+    uint8_t text[Wimp_IconNameLimit];
+    uint8_t sprite[Wimp_IconNameLimit];
+    uint8_t text_and_sprite[Wimp_IconNameLimit];
+    struct {
+        char * text;
+        char * validation;
+        int32_t size;
+    } indirected_text;
+    struct {
+        OSSpriteOp_Id id;
+        OSSpriteOp_Area * area;
+        int32_t size;
+    } indirected_sprite;
+    struct {
+        char * text;
+        char * validation;
+        int32_t size;
+    } indirected_text_and_sprite;
+} Wimp_IconData;
+
+typedef struct Wimp_Menu_s Wimp_Menu;
+
+struct Wimp_MenuEntry_s {
+    Wimp_MenuFlags menu_flags;
+    Wimp_Menu * sub_menu;
+    Wimp_IconFlags icon_flags;
+    Wimp_IconData data;
+};
+typedef struct Wimp_MenuEntry_s Wimp_MenuEntry;
+
+struct Wimp_Menu_s {
+    union {
+        uint8_t text[Wimp_MenuNameLimit];
+        struct {
+            char * text;
+            uint8_t reserved[8];
+        } indirected_text;
+    } title_data;
+    Wimp_Colour title_fg;
+    Wimp_Colour title_bg;
+    Wimp_Colour work_fg;
+    Wimp_Colour work_bg;
+    int32_t width;
+    int32_t height;
+    int32_t gap;
+    Wimp_MenuEntry entries[1];
+};
+
+struct Wimp_FullMessageMenuWarning_s {
+    Wimp_Menu * sub_menu;
+    OS_Coord pos;
+    Wimp_Selection selection;
+};
+typedef struct Wimp_FullMessageMenuWarning_s Wimp_FullMessageMenuWarning;
+
+struct Wimp_FullMessageMenusDeleted_s {
+    Wimp_Menu * menu;
+};
+typedef struct Wimp_FullMessageMenusDeleted_s Wimp_FullMessageMenusDeleted;
+
+struct Wimp_FullMessagePrequit_s {
+    Wimp_PreQuitFlags flags;
+};
+typedef struct Wimp_FullMessagePrequit_s Wimp_FullMessagePrequit;
+
+struct Wimp_FullMessageRAMXfer_s {
+    void * addr;
+    int32_t xfer_size;
+};
+typedef struct Wimp_FullMessageRAMXfer_s Wimp_FullMessageRAMXfer;
+
+struct Wimp_FullMessageReleaseEntity_s {
+    Wimp_ReleaseFlags flags;
+};
+typedef struct Wimp_FullMessageReleaseEntity_s Wimp_FullMessageReleaseEntity;
+
+struct Wimp_FullMessageSaveDesktopW_s {
+    OS_FW file;
+    Wimp_SaveDesktopFlags flags;
+};
+typedef struct Wimp_FullMessageSaveDesktopW_s Wimp_FullMessageSaveDesktopW;
+
+typedef uint32_t Wimp_ScreenEdgeNotificationFlags;
+
+struct Wimp_FullMessageScreenEdgeNotification_s {
+    Wimp_ScreenEdgeNotificationFlags flags;
+};
+typedef struct Wimp_FullMessageScreenEdgeNotification_s Wimp_FullMessageScreenEdgeNotification;
+
+struct Wimp_FullMessageSetSlot_s {
+    int32_t new_curr;
+    Wimp_T task;
+};
+typedef struct Wimp_FullMessageSetSlot_s Wimp_FullMessageSetSlot;
+
+struct Wimp_FullMessageShutdown_s {
+    Wimp_ShutdownFlags flags;
+};
+typedef struct Wimp_FullMessageShutdown_s Wimp_FullMessageShutdown;
+
+struct Wimp_FullMessageSlotSize_s {
+    int32_t new_curr;
+    int32_t new_next;
+};
+typedef struct Wimp_FullMessageSlotSize_s Wimp_FullMessageSlotSize;
+
+struct Wimp_FullMessageTaskInitialise_s {
+    void * cao;
+    int32_t memory_size;
+    uint8_t task_name[228];
+};
+typedef struct Wimp_FullMessageTaskInitialise_s Wimp_FullMessageTaskInitialise;
+
+struct Wimp_FullMessageTaskNameIs_s {
+    Wimp_T task;
+    int32_t slot_size;
+    uint8_t task_name[228];
+};
+typedef struct Wimp_FullMessageTaskNameIs_s Wimp_FullMessageTaskNameIs;
+
+struct Wimp_FullMessageTaskNameRq_s {
+    Wimp_T task;
+};
+typedef struct Wimp_FullMessageTaskNameRq_s Wimp_FullMessageTaskNameRq;
+
+typedef uint32_t Wimp_ToggleBackdropFlags;
+
+struct Wimp_FullMessageToggleBackdrop_s {
+    Wimp_ToggleBackdropFlags flags;
+};
+typedef struct Wimp_FullMessageToggleBackdrop_s Wimp_FullMessageToggleBackdrop;
+
+struct Wimp_FullMessageWindowClosed_s {
+    Wimp_W w;
+};
+typedef struct Wimp_FullMessageWindowClosed_s Wimp_FullMessageWindowClosed;
+
+struct Wimp_FullMessageWindowInfo_s {
+    Wimp_W w;
+    int32_t reserved;
+    uint8_t sprite_name[8];
+    uint8_t title[20];
+};
+typedef struct Wimp_FullMessageWindowInfo_s Wimp_FullMessageWindowInfo;
+
+typedef int32_t Wimp_Furniture;
+
+struct Wimp_Icon_s {
+    OS_Box extent;
+    Wimp_IconFlags flags;
+    Wimp_IconData data;
+};
+typedef struct Wimp_Icon_s Wimp_Icon;
+
+struct Wimp_IconCreate_s {
+    Wimp_W w;
+    Wimp_Icon icon;
+};
+typedef struct Wimp_IconCreate_s Wimp_IconCreate;
+
+struct Wimp_IconState_s {
+    Wimp_W w;
+    Wimp_I i;
+    Wimp_Icon icon;
+};
+typedef struct Wimp_IconState_s Wimp_IconState;
+
+typedef uint32_t Wimp_MenuStateFlags;
+
+struct Wimp_MessageFontChanged_s {
+    Font_F font;
+};
+typedef struct Wimp_MessageFontChanged_s Wimp_MessageFontChanged;
+
+struct Wimp_MessageHeader_s {
+    int32_t size;
+    Wimp_T sender;
+    int32_t my_ref;
+    int32_t your_ref;
+    uint32_t action;
+    uint8_t data[1];
+};
+typedef struct Wimp_MessageHeader_s Wimp_MessageHeader;
+
+struct Wimp_MessageIconise_s {
+    Wimp_W w;
+    Wimp_T task;
+    uint8_t title[20];
+};
+typedef struct Wimp_MessageIconise_s Wimp_MessageIconise;
+
+struct Wimp_MessageIconiseAt_s {
+    Wimp_W w;
+    Wimp_T task;
+    OS_Coord at;
+    Wimp_IconiseFlags flags;
+};
+typedef struct Wimp_MessageIconiseAt_s Wimp_MessageIconiseAt;
+
+struct Wimp_MessageList_s {
+    int32_t messages[1];
+};
+typedef struct Wimp_MessageList_s Wimp_MessageList;
+
+struct Wimp_MessageMenuWarning_s {
+    Wimp_Menu * sub_menu;
+    OS_Coord pos;
+    Wimp_Selection selection;
+};
+typedef struct Wimp_MessageMenuWarning_s Wimp_MessageMenuWarning;
+
+struct Wimp_MessageMenusDeleted_s {
+    Wimp_Menu * menu;
+};
+typedef struct Wimp_MessageMenusDeleted_s Wimp_MessageMenusDeleted;
+
+struct Wimp_MessageScreenEdgeNotification_s {
+    Wimp_ScreenEdgeNotificationFlags flags;
+};
+typedef struct Wimp_MessageScreenEdgeNotification_s Wimp_MessageScreenEdgeNotification;
+
+struct Wimp_MessageSetSlot_s {
+    int32_t new_curr;
+    Wimp_T task;
+};
+typedef struct Wimp_MessageSetSlot_s Wimp_MessageSetSlot;
+
+struct Wimp_MessageSlotSize_s {
+    int32_t new_curr;
+    int32_t new_next;
+};
+typedef struct Wimp_MessageSlotSize_s Wimp_MessageSlotSize;
+
+struct Wimp_MessageTaskInitialise_s {
+    void * cao;
+    int32_t size;
+    uint8_t task_name[228];
+};
+typedef struct Wimp_MessageTaskInitialise_s Wimp_MessageTaskInitialise;
+
+struct Wimp_MessageTaskNameIs_s {
+    Wimp_T task;
+    int32_t size;
+    uint8_t task_name[228];
+};
+typedef struct Wimp_MessageTaskNameIs_s Wimp_MessageTaskNameIs;
+
+struct Wimp_MessageTaskNameRq_s {
+    Wimp_T task;
+};
+typedef struct Wimp_MessageTaskNameRq_s Wimp_MessageTaskNameRq;
+
+struct Wimp_MessageToggleBackdrop_s {
+    Wimp_ToggleBackdropFlags flags;
+};
+typedef struct Wimp_MessageToggleBackdrop_s Wimp_MessageToggleBackdrop;
+
+struct Wimp_MessageWindowClosed_s {
+    Wimp_W w;
+};
+typedef struct Wimp_MessageWindowClosed_s Wimp_MessageWindowClosed;
+
+struct Wimp_MessageWindowInfo_s {
+    Wimp_W w;
+    int32_t reserved;
+    uint8_t sprite_name[8];
+    uint8_t title[20];
+};
+typedef struct Wimp_MessageWindowInfo_s Wimp_MessageWindowInfo;
+
+struct Wimp_Outline_s {
+    Wimp_W w;
+    OS_Box outline;
+};
+typedef struct Wimp_Outline_s Wimp_Outline;
+
+typedef uint32_t Wimp_PlotIconFlags;
+
+typedef uint32_t Wimp_PollFlags;
+
+typedef uint32_t Wimp_Priority;
+
+struct Wimp_SetIconStateBlock_s {
+    Wimp_W w;
+    Wimp_I i;
+    Wimp_IconFlags eor_bits;
+    Wimp_IconFlags clear_bits;
+};
+typedef struct Wimp_SetIconStateBlock_s Wimp_SetIconStateBlock;
+
+struct Wimp_TextSelection_s {
+    Wimp_W w;
+    Wimp_I i;
+    int32_t start_index;
+    int32_t end_index;
+};
+typedef struct Wimp_TextSelection_s Wimp_TextSelection;
+
+typedef int32_t Wimp_VersionNo;
+
+typedef uint32_t Wimp_WindowFlags;
+
+struct Wimp_Window_s {
+    OS_Box visible;
+    int32_t xscroll;
+    int32_t yscroll;
+    Wimp_W next;
+    Wimp_WindowFlags flags;
+    Wimp_Colour title_fg;
+    Wimp_Colour title_bg;
+    Wimp_Colour work_fg;
+    Wimp_Colour work_bg;
+    Wimp_Colour scroll_outer;
+    Wimp_Colour scroll_inner;
+    Wimp_Colour highlight_bg;
+    Wimp_ExtraWindowFlags extra_flags;
+    OS_Box extent;
+    Wimp_IconFlags title_flags;
+    Wimp_IconFlags work_flags;
+    OSSpriteOp_Area * sprite_area;
+    int16_t xmin;
+    int16_t ymin;
+    Wimp_IconData title_data;
+    int32_t icon_count;
+    Wimp_Icon icons[1];
+};
+typedef struct Wimp_Window_s Wimp_Window;
+
+struct Wimp_WindowInfo_s {
+    Wimp_W w;
+    OS_Box visible;
+    int32_t xscroll;
+    int32_t yscroll;
+    Wimp_W next;
+    Wimp_WindowFlags flags;
+    Wimp_Colour title_fg;
+    Wimp_Colour title_bg;
+    Wimp_Colour work_fg;
+    Wimp_Colour work_bg;
+    Wimp_Colour scroll_outer;
+    Wimp_Colour scroll_inner;
+    Wimp_Colour highlight_bg;
+    Wimp_ExtraWindowFlags extra_flags;
+    OS_Box extent;
+    Wimp_IconFlags title_flags;
+    Wimp_IconFlags work_flags;
+    OSSpriteOp_Area * sprite_area;
+    int16_t xmin;
+    int16_t ymin;
+    Wimp_IconData title_data;
+    int32_t icon_count;
+    Wimp_Icon icons[1];
+};
+typedef struct Wimp_WindowInfo_s Wimp_WindowInfo;
+
+typedef uint32_t Wimp_WindowNestingFlags;
+
+struct Wimp_WindowState_s {
+    Wimp_W w;
+    OS_Box visible;
+    int32_t xscroll;
+    int32_t yscroll;
+    Wimp_W next;
+    Wimp_WindowFlags flags;
+};
+typedef struct Wimp_WindowState_s Wimp_WindowState;
+
+struct OS_Error_s {
+    uint32_t errnum;
+    uint8_t errmess[OS_ErrorLimit];
+};
+typedef struct OS_Error_s OS_Error;
+
+typedef int32_t OS_T;
+
+typedef void * OS_Mode;
+
+typedef uint32_t OS_Colour;
+
+struct OS_Palette_s {
+    OS_Colour entries[1];
+};
+typedef struct OS_Palette_s OS_Palette;
+
+typedef uint32_t OSSpriteOp_Flags;
+
+struct OS_Factors_s {
+    int32_t xmul;
+    int32_t ymul;
+    int32_t xdiv;
+    int32_t ydiv;
+};
+typedef struct OS_Factors_s OS_Factors;
+
+struct OSSpriteOp_TransTab_s {
+    uint8_t c[1];
+};
+typedef struct OSSpriteOp_TransTab_s OSSpriteOp_TransTab;
+
+
+
+
+#endif

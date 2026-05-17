@@ -11,6 +11,7 @@
 #include "swis.h"
 
 #include "GContext/gcontext.h"
+#include "types.h"
 
 #include "VersionNum"
 
