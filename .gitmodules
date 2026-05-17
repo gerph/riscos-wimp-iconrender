@@ -1,3 +1,6 @@
 [submodule "riscos-wimp-validationstrings"]
 	path = riscos-wimp-validationstrings
 	url = https://github.com/gerph/riscos-wimp-validationstrings.git
+[submodule "riscos-wimp-textrender"]
+	path = riscos-wimp-textrender
+	url = https://github.com/gerph/riscos-wimp-textrender.git

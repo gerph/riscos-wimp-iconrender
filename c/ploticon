@@ -7,7 +7,6 @@
 #include "ploticon.h"
 #include "iconborders.h"
 #include "sprite.h"
-#include "text.h"
 #include "config.h"
 #include "validationcache.h"
 #include <string.h>
@@ -126,7 +125,7 @@ static void get_icon_data(const Wimp_Icon *icon, const char **text, const char *
     }
 }
 
-void ploticon_render(gcontext_t *gcontext, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
+void ploticon_render(gcontext_t *gcontext, textrender_t *trender, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
 {
     const char *text_str;
     const char *validation_str;
@@ -241,7 +240,8 @@ void ploticon_render(gcontext_t *gcontext, const Wimp_Icon *icon, int x, int y, 
         int tx;
         int ty;
 
-        text_size(text_str, &tw, &th);
+        tw = textrender_stringwidth(trender, text_str, -1);
+        th = 32; // Assuming system font height
         align = get_text_alignment(icon->flags);
 
         tx = bounds.x0;
@@ -253,8 +253,8 @@ void ploticon_render(gcontext_t *gcontext, const Wimp_Icon *icon, int x, int y, 
         if (align.valign == 0) ty += (icon_height - th) / 2;
         else if (align.valign == 1) ty += (icon_height - th);
 
-        text_render(gcontext, colours[COLOUR_FG], colours[COLOUR_BG], text_str,
-                    tx, ty, bounds.x0, bounds.y0, bounds.x1, bounds.y1);
+        textrender_setcolours(trender, colours[COLOUR_BG], colours[COLOUR_FG]);
+        textrender_paint(trender, text_str, -1, tx, ty + 8);
     }
 
     if (icon->flags & Wimp_IconBorder)

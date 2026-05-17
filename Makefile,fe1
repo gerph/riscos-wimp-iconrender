@@ -39,7 +39,10 @@ OBJS       = o.main \
              o.iconborders \
              o.palette \
              o.sprite \
-             o.text \
+             o.textrender \
+             o.textrender_nvram \
+             o.wimpsymbol \
+             o.vdu5chars \
              o.validation \
              o.validationcache
 
