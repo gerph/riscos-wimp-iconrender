@@ -324,21 +324,92 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
             }
         }
 
-        tw = textrender_stringwidth(trender, render_text, -1);
-        th = 32; // Assuming system font height
         align = get_text_alignment(icon->flags);
-
-        tx = bounds.x0;
-        ty = bounds.y0;
-
-        if (align.halign == 0) tx += (icon_width - tw) / 2;
-        else if (align.halign == 1) tx += (icon_width - tw);
-
-        if (align.valign == 0) ty += (icon_height - th) / 2;
-        else if (align.valign == 1) ty += (icon_height - th);
-
         textrender_setcolours(trender, colours[COLOUR_BG], colours[COLOUR_FG]);
-        textrender_paint(trender, render_text, -1, tx, ty + 8);
+
+        if (vc && vc->valid.line)
+        {
+            typedef struct {
+                const char *text;
+                int len;
+                int width;
+            } row_t;
+            row_t rows[32];
+            int row_count = 0;
+            int max_width = 0;
+            int row_height = vc->multiline_spacing ? vc->multiline_spacing : 40;
+            const char *p = render_text;
+            int icon_text_width = icon_width - 16;
+            int i;
+
+            if (icon_text_width < 0) icon_text_width = 0;
+
+            while (*p >= ' ' && row_count < 32)
+            {
+                const char *split = textrender_stringwidthwithsplit(trender, p, -1, icon_text_width, 32);
+                int len, display_len;
+
+                if (split == p && *p >= ' ') split = p + 1;
+
+                len = split - p;
+                display_len = len;
+                while (display_len > 0 && p[display_len-1] == ' ') display_len--;
+
+                rows[row_count].text = p;
+                rows[row_count].len = len;
+                rows[row_count].width = textrender_stringwidth(trender, p, display_len);
+                if (rows[row_count].width > max_width) max_width = rows[row_count].width;
+
+                p = split;
+                while (*p == ' ') p++;
+                row_count++;
+            }
+
+            tw = max_width;
+            th = row_count * row_height;
+
+            if (!wimp_config.multiline_alignment)
+            {
+                align.halign = 0;
+                align.valign = 0;
+            }
+
+            tx = bounds.x0;
+            ty = bounds.y0;
+
+            if (align.halign == 0) tx += (icon_width - tw) / 2;
+            else if (align.halign == 1) tx += (icon_width - tw);
+
+            if (align.valign == 0) ty += (icon_height - th) / 2;
+            else if (align.valign == 1) ty += (icon_height - th);
+
+            for (i = 0; i < row_count; i++)
+            {
+                int row_idx = row_count - 1 - i;
+                int row_tx = tx;
+                if (align.halign == 0) row_tx = tx + (tw - rows[row_idx].width) / 2;
+                else if (align.halign == 1) row_tx = tx + (tw - rows[row_idx].width);
+
+                textrender_paint(trender, rows[row_idx].text, rows[row_idx].len, row_tx, ty + 8);
+                ty += row_height;
+            }
+        }
+        else
+        {
+            tw = textrender_stringwidth(trender, render_text, -1);
+            th = 32; // Assuming system font height
+
+            tx = bounds.x0;
+            ty = bounds.y0;
+
+            if (align.halign == 0) tx += (icon_width - tw) / 2;
+            else if (align.halign == 1) tx += (icon_width - tw);
+
+            if (align.valign == 0) ty += (icon_height - th) / 2;
+            else if (align.valign == 1) ty += (icon_height - th);
+
+            textrender_paint(trender, render_text, -1, tx, ty + 8);
+        }
 
         if (password_str) free(password_str);
     }

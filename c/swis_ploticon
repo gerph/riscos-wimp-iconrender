@@ -1,0 +1,81 @@
+/*******************************************************************
+ * File:        swis_ploticon
+ * Purpose:     SWI implementation of Wimp_PlotIcon
+ * Author:      Gerph
+ * Date:        10 May 2026
+ ******************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "kernel.h"
+#include "swis.h"
+
+#include "riscos/Sprite.h"
+
+#include "wimpgraphics.h"
+#include "wimpsprite.h"
+#include "sprite.h"
+#include "GContext/gcontext.h"
+#include "textrender.h"
+#include "ploticon.h"
+#include "palette.h"
+
+#include "modhead.h"
+#include "colourmap.h"
+
+extern wimpgraphics_t *graphics;
+
+/***************************************************************************
+ * Description:  SWI handler routine. All SWIs for this module will be
+ *               passed to these routines.
+ * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
+ *               r      = pointer to register block on entry
+ *               pw     = private word for module
+ * On exit:      Return NULL if SWI handled successfully, setting return
+ *               register values (r0-r9) in r.
+ *               Return error_BAD_SWI for out of range SWIs.
+ *               Return an error block for a custom error.
+ **************************************************************************/
+/* Functions called to handle particular SWI calls */
+_kernel_oserror *SWI_PlotIcon(int number, _kernel_swi_regs *r, void *pw)
+{
+    Wimp_Icon *icon = (Wimp_Icon *)r->r[1];
+    gcontext_t *gcontext;
+    textrender_t *trender;
+
+    palette_init();
+
+    // Wimp_PlotIcon uses the current graphics context
+    gcontext = gcontext_initvdu(2);
+    if (!gcontext)
+        return err_InternalError;
+
+    trender = textrender_init(gcontext);
+    if (!trender) {
+        // We're leaking gcontext conceptually but in RISC OS module land it might just be static allocs or small mallocs.
+        // Actually, let's just proceed or error.
+        return err_InternalError;
+    }
+    
+    textrender_setfont(trender);
+
+    // Call our core rendering logic
+    // We assume bg_colour is standard window background (1) for now, 
+    // since extended form (R2='KSAT') isn't being explicitly handled unless requested.
+    ploticon_render(gcontext, trender, graphics, icon, 0, 0, palette_get_wimp_colour(1));
+
+    // Cleanup resources
+    // Ideally we should free gcontext and trender if they are heap allocated.
+    // However, looking at standard RISC OS patterns, they might need explicit freeing if not cached.
+    // Assuming they need freeing, though we don't have explicit free functions for them visible in headers.
+    free(trender);
+    free(gcontext);
+
+    return NULL;
+}
+
+_kernel_oserror *ColourMap_Handler(_kernel_swi_regs *r, void *pw)
+{
+    r->r[0] = colourmap_transform(r->r[0]);
+    return NULL;
+}

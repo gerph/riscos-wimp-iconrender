@@ -33,25 +33,27 @@ CDEFINES   = -DAPP
 LIBS       = ${CLIB} C:GContext.o.libGContext
 
 # Objects to build, using the format o.<name> (will be varied for build type)
-OBJS       = o.main \
-             o.testicon \
-             o.ploticon \
-             o.iconborders \
-             o.palette \
-             o.sprite \
-             o.colourmap \
+OBJS       = o.colourmap \
              o.colourtrans \
+             o.iconborders \
+             o.main \
+             o.modhead \
+             o.module \
+             o.palette \
+             o.ploticon \
              o.scale \
-             o.tile \
-             o.wimpgraphics \
-             o.wimpsprite \
+             o.sprite \
+             o.testicon \
              o.textrender \
              o.textrender_nvram \
-             o.wimpsymbol \
-             o.vdu5chars \
+             o.tile \
              o.validation \
              o.validationcache \
-             o.colourmap_user_shim
+             o.vdu5chars \
+             o.wimpgraphics \
+             o.wimpsprite \
+             o.wimpsymbol \
+
 
 ifeq (${BUILD64},1)
 OBJS +=    	 o.colourmap_user_shim64
@@ -64,7 +66,24 @@ endif
 
 
 include LibraryCommand
-
+# Additional dependencies
+$(ODIR).colourmap: h.colourmap
+$(ODIR).colourtrans: h.colourtrans
+$(ODIR).iconborders: h.iconborders h.types h.palette
+$(ODIR).palette: h.palette
+$(ODIR).ploticon: h.ploticon h.types h.palette h.textrender h.wimpgraphics h.iconborders h.config h.validationcache h.wimpsprite h.scale h.sprite h.colourtransconstants
+$(ODIR).scale: h.scale
+$(ODIR).sprite: h.sprite h.colourtransconstants h.types h.scale h.tile
+$(ODIR).testicon: h.ploticon h.types h.palette h.textrender h.wimpgraphics
+$(ODIR).textrender: h.textrender h.textrender_nvram h.wimpsymbol
+$(ODIR).textrender_nvram: h.textrender_nvram h.textrender
+$(ODIR).tile: h.scale h.tile
+$(ODIR).validation: h.validation
+$(ODIR).validationcache: h.validationcache h.validation
+$(ODIR).vdu5chars: h.wimpsymbol
+$(ODIR).wimpgraphics: h.wimpgraphics h.types
+$(ODIR).wimpsprite: h.wimpsprite h.scale h.sprite h.colourtransconstants h.types h.wimpgraphics h.spriteconstants h.palette h.colourtrans h.colourmap
+$(ODIR).wimpsymbol: h.wimpsymbol
 
 #---------------------------------------------------------------------------
 # Dynamic dependencies:
