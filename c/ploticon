@@ -172,9 +172,13 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
 
     if (selected)
     {
-        // Simple selection swap if no special border
-        if (border_type == 0)
+        if (vc && vc->valid.border && vc->border_slabin != WimpColour_None)
         {
+            colours[COLOUR_BG] = palette_get_wimp_colour(vc->border_slabin);
+        }
+        else if (border_type == 0)
+        {
+            // Simple selection swap if no special border
             colour_t tmp = colours[COLOUR_FG];
             colours[COLOUR_FG] = colours[COLOUR_BG];
             colours[COLOUR_BG] = tmp;
@@ -304,8 +308,23 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
         alignment_t align;
         int tx;
         int ty;
+        char *password_str = NULL;
+        const char *render_text = text_str;
 
-        tw = textrender_stringwidth(trender, text_str, -1);
+        if (vc && vc->valid.display && vc->display_char)
+        {
+            int len = 0;
+            while (text_str[len] >= ' ') len++;
+            password_str = malloc(len + 1);
+            if (password_str)
+            {
+                memset(password_str, vc->display_char, len);
+                password_str[len] = '\0';
+                render_text = password_str;
+            }
+        }
+
+        tw = textrender_stringwidth(trender, render_text, -1);
         th = 32; // Assuming system font height
         align = get_text_alignment(icon->flags);
 
@@ -319,7 +338,9 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
         else if (align.valign == 1) ty += (icon_height - th);
 
         textrender_setcolours(trender, colours[COLOUR_BG], colours[COLOUR_FG]);
-        textrender_paint(trender, text_str, -1, tx, ty + 8);
+        textrender_paint(trender, render_text, -1, tx, ty + 8);
+
+        if (password_str) free(password_str);
     }
 
     if (icon->flags & Wimp_IconBorder)
