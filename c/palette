@@ -27,6 +27,12 @@ wimp_palette_t default_wimp_palette = {
 
 wimp_palette_t current_wimp_palette;
 
+/*************************************************** Gerph *********
+ Function:      palette_init
+ Description:   Initialise the palette
+ Parameters:    none
+ Returns:       none
+ ******************************************************************/
 void palette_init(void)
 {
     memcpy(&current_wimp_palette, &default_wimp_palette, sizeof(default_wimp_palette));

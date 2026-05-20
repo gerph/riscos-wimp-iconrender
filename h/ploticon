@@ -22,7 +22,7 @@
                 icon -> icon definition
                 x, y = offset to apply to icon position
                 bg_colour = window background colour (&BBGGRR00)
- Returns:       void
+ Returns:       none
  ******************************************************************/
 void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t *graphics, const Wimp_Icon *icon, int x, int y, colour_t bg_colour);
 

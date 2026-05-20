@@ -16,6 +16,12 @@
 #include "textrender.h"
 #include "wimpgraphics.h"
 
+/*************************************************** Gerph *********
+ Function:      testicon
+ Description:   Test icon rendering
+ Parameters:    none
+ Returns:       none
+ ******************************************************************/
 void testicon(void)
 {
     gcontext_t *gcontext;

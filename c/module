@@ -24,18 +24,17 @@
 wimpgraphics_t *graphics;
 void *module_pw;
 
-/***************************************************************************
+/*******************************************************************
  * Function:     Mod_Init
  * Description:  Initialise the module, setting up vectors, callbacks and
  *               any other parts of the system necessary for the module to
  *               function.
- * Parameters:   tail        = pointer to command line (control terminated)
+ * Parameters:   tail = pointer to command line (control terminated)
  *               podule_base = address of podule module was started from, or
  *                             NULL if none
- *               pw          = private word for module
- * On exit:      Return NULL for successful initialisation, or a pointer to
- *               an error block if the module could not start properly.
- **************************************************************************/
+ *               pw = private word for module
+ * Returns:      pointer to error block or NULL if successful
+ ******************************************************************/
 _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
 {
     graphics = wimpgraphics_create();

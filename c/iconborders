@@ -115,6 +115,13 @@ static const int border_wimp_colours[][6] = {
     {7, 0, 3, 1, 0, 4}  // 7
 };
 
+/*******************************************************************
+ Function:      iconborders_get_default_colours
+ Description:   Get the default colours for a border type
+ Parameters:    border_type = border type (0-7)
+                colours = array of 6 colours to populate
+ Returns:       none
+ ******************************************************************/
 void iconborders_get_default_colours(int border_type, colour_t *colours)
 {
     int i;

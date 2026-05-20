@@ -24,18 +24,17 @@
 #include "colourmap.h"
 
 extern wimpgraphics_t *graphics;
-
-/***************************************************************************
- * Description:  SWI handler routine. All SWIs for this module will be
- *               passed to these routines.
- * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
- *               r      = pointer to register block on entry
- *               pw     = private word for module
- * On exit:      Return NULL if SWI handled successfully, setting return
- *               register values (r0-r9) in r.
- *               Return error_BAD_SWI for out of range SWIs.
- *               Return an error block for a custom error.
- **************************************************************************/
+/*******************************************************************
+ Function:      SWI_PlotIcon
+ Description:   SWI handler for Wimp_PlotIcon
+ Parameters:     number = SWI number within SWI chunk (i.e. 0 to 63)
+                 r      = pointer to register block on entry
+                 pw     = private word for module
+ On exit:        Return NULL if SWI handled successfully, setting return
+                 register values (r0-r9) in r.
+                 Return error_BAD_SWI for out of range SWIs.
+                 Return an error block for a custom error.
+ ******************************************************************/
 /* Functions called to handle particular SWI calls */
 _kernel_oserror *SWI_PlotIcon(int number, _kernel_swi_regs *r, void *pw)
 {
@@ -74,6 +73,13 @@ _kernel_oserror *SWI_PlotIcon(int number, _kernel_swi_regs *r, void *pw)
     return NULL;
 }
 
+/*************************************************** Gerph *********
+ Function:      ColourMap_Handler
+ Description:   Handler for the ColourMap entry point
+ Parameters:    r = pointer to register block on entry
+                pw = private word for module
+ Returns:       NULL if successful, or pointer to error block
+ ******************************************************************/
 _kernel_oserror *ColourMap_Handler(_kernel_swi_regs *r, void *pw)
 {
     r->r[0] = colourmap_transform(r->r[0]);

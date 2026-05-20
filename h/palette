@@ -19,6 +19,12 @@ typedef struct wimp_palette_s {
 extern wimp_palette_t default_wimp_palette;
 extern wimp_palette_t current_wimp_palette;
 
+/*************************************************** Gerph *********
+ Function:      palette_init
+ Description:   Initialise the palette
+ Parameters:    none
+ Returns:       none
+ ******************************************************************/
 void palette_init(void);
 
 /*************************************************** Gerph *********
