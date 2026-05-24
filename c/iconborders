@@ -6,6 +6,16 @@
 
 #include "iconborders.h"
 #include <string.h>
+#include <stdio.h>
+
+//#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
 
 typedef struct {
     int top, left, bottom, right;
@@ -77,24 +87,60 @@ void iconborders_render(gcontext_t *gcontext, int border_type, bool selected, co
     const border_def_t *def = find_border_def(border_type, selected);
     OS_Box b = *box;
     int i;
-    int pixel_size = 2; // Assuming 2 OS units per pixel
+    int pixel_size = 2; // FIXME: Assuming 2 OS units per pixel
+    int pixel_size_x = 2;
+    int pixel_size_y = 2; // Both wrong.
 
+    dprintf("Border rendering for type %i\n", border_type);
     for (i = 0; i < def->rim_count; i++)
     {
         int width = def->rims[i].width;
         int step;
         if (width == 1) width = pixel_size;
-        
+
         for (step = 0; step < width; step += pixel_size)
         {
+            dprintf("Bordering step %i\n", step);
             // Top
-            gcontext->rectangle_fill(gcontext, colours[def->rims[i].top], b.x0, b.y1 - pixel_size, b.x1, b.y1);
-            // Bottom
-            gcontext->rectangle_fill(gcontext, colours[def->rims[i].bottom], b.x0, b.y0, b.x1, b.y0 + pixel_size);
+            gcontext->line_start(gcontext, colours[def->rims[i].top]);
+            gcontext->line_line(gcontext, b.x1 - 1, b.y1 - 1, b.x0, b.y1 - 1);
+
             // Left
-            gcontext->rectangle_fill(gcontext, colours[def->rims[i].left], b.x0, b.y0, b.x0 + pixel_size, b.y1);
+            if (colours[def->rims[i].top] == colours[def->rims[i].left])
+            {
+                gcontext->line_line(gcontext, b.x0, b.y1 - 1, b.x0, b.y0);
+            }
+            else
+            {
+                gcontext->line_end(gcontext);
+                gcontext->line_start(gcontext, colours[def->rims[i].left]);
+                gcontext->line_line(gcontext, b.x0, b.y1 - 1 - pixel_size_y, b.x0, b.y0);
+            }
+
+            // Bottom
+            if (colours[def->rims[i].left] == colours[def->rims[i].bottom])
+            {
+                gcontext->line_line(gcontext, b.x0, b.y0, b.x1 - 1, b.y0);
+            }
+            else
+            {
+                gcontext->line_end(gcontext);
+                gcontext->line_start(gcontext, colours[def->rims[i].bottom]);
+                gcontext->line_line(gcontext, b.x0 + pixel_size_x, b.y0, b.x1 - 1, b.y0);
+            }
+
             // Right
-            gcontext->rectangle_fill(gcontext, colours[def->rims[i].right], b.x1 - pixel_size, b.y0, b.x1, b.y1);
+            if (colours[def->rims[i].bottom] == colours[def->rims[i].right])
+            {
+                gcontext->line_line(gcontext, b.x1 - 1, b.y0, b.x1 - 1, b.y1 - 1);
+            }
+            else
+            {
+                gcontext->line_end(gcontext);
+                gcontext->line_start(gcontext, colours[def->rims[i].right]);
+                gcontext->line_line(gcontext, b.x1 - 1, b.y0 + pixel_size_y, b.x1 - 1, b.y1 - 1);
+            }
+            gcontext->line_end(gcontext);
 
             b.x0 += pixel_size;
             b.y0 += pixel_size;
