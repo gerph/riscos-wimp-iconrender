@@ -8,6 +8,7 @@
 #include "iconborders.h"
 #include "config.h"
 #include "validationcache.h"
+#include "colourmap.h"
 #include "wimpsprite.h"
 #include "swis.h"
 #include "riscos/Sprite.h"
@@ -194,7 +195,16 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
         // TODO: Other border selection colouring
     }
 
-    // TODO: Shading
+    if (shaded)
+    {
+        int i;
+        colourmap_setup(selected,
+                        shaded,
+                        bg_colour,
+                        COLOUR_RGB(0x22, 0x66, 0x22));
+        for (i=0; i<6; i++)
+            colours[i] = colourmap_transform(colours[i]);
+    }
 
     bounds = icon->extent;
     bounds.x0 += x; bounds.x1 += x;
