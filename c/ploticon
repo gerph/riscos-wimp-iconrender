@@ -312,6 +312,8 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
         }
     }
 
+    /* FIXME: Push a clipping rectangle, not assert it */
+    gcontext->clip_rectangle(gcontext, (bbox_t*)&bounds);
     if (icon->flags & Wimp_IconText)
     {
         int tw, th;
@@ -393,6 +395,12 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
             if (align.valign == 0) ty += (icon_height - th) / 2;
             else if (align.valign == 1) ty += (icon_height - th);
 
+            // If there is no filled background, and there is a sprite flag set, we draw a background behind the text only
+            if (! (icon->flags & Wimp_IconFilled) && (icon->flags & Wimp_IconSprite))
+            {
+                gcontext->rectangle_fill(gcontext, colours[COLOUR_BG], tx, ty, tx + tw - 1, ty + th - 1);
+            }
+
             for (i = 0; i < row_count; i++)
             {
                 int row_idx = row_count - 1 - i;
@@ -418,11 +426,20 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
             if (align.valign == 0) ty += (icon_height - th) / 2;
             else if (align.valign == 1) ty += (icon_height - th);
 
+            // If there is no filled background, and there is a sprite flag set, we draw a background behind the text only
+            if (! (icon->flags & Wimp_IconFilled) && (icon->flags & Wimp_IconSprite))
+            {
+                gcontext->rectangle_fill(gcontext, colours[COLOUR_BG], tx, ty, tx + tw - 1, ty + th - 1);
+            }
+
             textrender_paint(trender, render_text, -1, tx, ty + 8);
         }
 
         if (password_str) free(password_str);
     }
+    /* FIXME: Pop graphics clipping */
+    gcontext->clip_rectangle(gcontext, NULL);
+
 
     if (icon->flags & Wimp_IconBorder)
     {
