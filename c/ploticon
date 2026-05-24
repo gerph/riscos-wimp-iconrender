@@ -137,6 +137,7 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
     int border_type;
     bool selected;
     bool shaded;
+    bool use_alternate_sprite = false;
     colour_t colours[6];
     OS_Box bounds;
     OS_Box border_bounds;
@@ -153,6 +154,13 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
 
     selected = (icon->flags & Wimp_IconSelected) != 0;
     shaded = (icon->flags & Wimp_IconShaded) != 0;
+
+    if ((icon->flags & (Wimp_IconSprite | Wimp_IconIndirected | Wimp_IconText)) == (Wimp_IconSprite | Wimp_IconIndirected | Wimp_IconText))
+    {
+        use_alternate_sprite = selected && vc->sprite_on_offset;
+        if (use_alternate_sprite)
+            selected = false;
+    }
 
     iconborders_get_default_colours(border_type, colours);
 
@@ -219,10 +227,12 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
 
         if (icon->flags & Wimp_IconIndirected) {
             if (icon->flags & Wimp_IconText) {
-                if (vc && vc->sprite_on_offset) {
-                    const char *s_name = validation_str + vc->sprite_on_offset;
+                if (vc && vc->sprite_off_offset) {
+                    int offset = use_alternate_sprite ? vc->sprite_on_offset : vc->sprite_off_offset;
+                    const char *s_name = validation_str + offset;
                     int i = 0;
                     while (i < 12 && s_name[i] != ';' && s_name[i] != ',' && s_name[i] > 31) {
+                        /* FIXME: Does not handle \ escaping. */
                         sprite_name[i] = s_name[i];
                         i++;
                     }
@@ -230,7 +240,7 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
                     has_sprite_name = true;
                     // For validation string sprites, usually area is 1 (Wimp pool) or 0 (System)
                     // Wimp typically searches both, but we'll try Wimp pool (1) here or pass 0.
-                    // For now, pass 0 to search system, then Wimp pool if needed. 
+                    // For now, pass 0 to search system, then Wimp pool if needed.
                     // Actually, let's just pass (void*)1 as default.
                     sprite_area = (void *)1;
                 }

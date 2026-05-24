@@ -12,6 +12,7 @@
 
 #include "wimpgraphics.h"
 
+#include "colourmap.h"
 
 #define DEBUG
 
@@ -42,6 +43,9 @@ _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
         return err_InternalError;
 
     module_pw = pw;
+
+    /* Temporarily force to invert to match our expectations */
+    select_algorithm = sela_invert;
 
     dprintf("Module WimpPlotIcon initialised\n");
     return NULL;
