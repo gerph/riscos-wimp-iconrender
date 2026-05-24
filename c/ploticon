@@ -420,6 +420,10 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
             tx = bounds.x0;
             ty = bounds.y0;
 
+            // If the text width is wider than the icon and we're horizontally centred, we force right aligned.
+            if (align.halign == 0 && tw > icon_width)
+                align.halign = 1;
+
             if (align.halign == 0) tx += (icon_width - tw) / 2;
             else if (align.halign == 1) tx += (icon_width - tw);
 
