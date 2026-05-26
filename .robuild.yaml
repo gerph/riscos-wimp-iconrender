@@ -35,7 +35,7 @@ jobs:
       # Build component
       - echo
       - echo *** Build the component ***
-      - amu -f Makefile install INSTDIR=Install
+      - amu -f MakefileTest install INSTDIR=Install
 
       # Test the command
       - echo
@@ -52,25 +52,25 @@ jobs:
       # Export our headers and libraries
       - echo
       - echo *** Export the headers or libs ***
-      - amu -f MakefileMod export
+      - amu -f Makefile export
 
       # Build modules (RAM)
       - echo
       - echo *** Build the RAM module (32-bit) ***
-      - amu -f MakefileMod ram
+      - amu -f Makefile ram
 
       - echo
       - echo *** Build the RAM module (26-bit) ***
-      - amu -f MakefileMod ram BUILD26=1 BUILD32=
+      - amu -f Makefile ram BUILD26=1 BUILD32=
 
       # Build modules for ROM
       - echo
       - echo *** Build the ROM module (32-bit) ***
-      - amu -f MakefileMod rom
+      - amu -f Makefile rom
 
       - echo
       - echo *** Build the ROM module (26-bit) ***
-      - amu -f MakefileMod rom BUILD26=1 BUILD32=
+      - amu -f Makefile rom BUILD26=1 BUILD32=
 
       # Tests - loading to check that it starts up
       - echo

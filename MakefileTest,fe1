@@ -1,0 +1,88 @@
+#!/usr/bin/env riscos-amu -f
+# Makefile for PlotIcon
+#
+
+#
+# Program specific options:
+#
+COMPONENT  = PlotIcon
+
+# Specifies additional targets for startup
+#INITTARGET = inittarget
+
+# Specifies additional targets for clean
+#CLEANTARGET = cleantarget
+
+# aif, for linked objects
+# aof, for a partially linked AOF object
+# util, for utilities built with objasm
+# basic, for BASIC tools
+TYPE       = aif
+
+# The file to output (defaults ${COMPONENT})
+#TARGET = <filename>
+
+# Comma-separated list of paths to use for includes, such as:
+#	C:LibName.
+INCLUDES   = C:
+
+# Space separated list of defines to set, eg -DDEBUG
+CDEFINES   = -DAPP
+
+# Space separated list of libraries to link against, eg C:LibName.o.libLibName
+LIBS       = ${CLIB} C:GContext.o.libGContext
+
+# Objects to build, using the format o.<name> (will be varied for build type)
+OBJS       = o.colourmap \
+             o.colourtrans \
+             o.iconborders \
+             o.main \
+             o.palette \
+             o.ploticon \
+             o.scale \
+             o.sprite \
+             o.testicon \
+             o.textrender \
+             o.textrender_nvram \
+             o.tile \
+             o.validation \
+             o.validationcache \
+             o.vdu5chars \
+             o.wimpgraphics \
+             o.wimpsprite \
+             o.wimpsymbol \
+
+
+ifeq (${BUILD64},1)
+OBJS +=    	 o.colourmap_user_shim64
+else
+OBJS +=   	 o.colourmap_user_shim
+endif
+
+# Space separated list of XML files for building documentation.
+#DOCSRC = <prm-in-xml-sources>
+
+
+include LibraryCommand
+# Additional dependencies
+$(ODIR).colourmap: h.colourmap
+$(ODIR).colourtrans: h.colourtrans
+$(ODIR).iconborders: h.iconborders h.types h.palette
+$(ODIR).palette: h.palette
+$(ODIR).ploticon: h.ploticon h.types h.palette h.textrender h.wimpgraphics h.iconborders h.config h.validationcache h.wimpsprite h.scale h.sprite h.colourtransconstants
+$(ODIR).scale: h.scale
+$(ODIR).sprite: h.sprite h.colourtransconstants h.types h.scale h.tile
+$(ODIR).testicon: h.ploticon h.types h.palette h.textrender h.wimpgraphics
+$(ODIR).textrender: h.textrender h.textrender_nvram h.wimpsymbol
+$(ODIR).textrender_nvram: h.textrender_nvram h.textrender
+$(ODIR).tile: h.scale h.tile
+$(ODIR).validation: h.validation
+$(ODIR).validationcache: h.validationcache h.validation
+$(ODIR).vdu5chars: h.wimpsymbol
+$(ODIR).wimpgraphics: h.wimpgraphics h.types
+$(ODIR).wimpsprite: h.wimpsprite h.scale h.sprite h.colourtransconstants h.types h.wimpgraphics h.spriteconstants h.palette h.colourtrans h.colourmap
+$(ODIR).wimpsymbol: h.wimpsymbol
+
+#---------------------------------------------------------------------------
+# Dynamic dependencies:
+
