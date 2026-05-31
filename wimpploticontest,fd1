@@ -183,7 +183,7 @@ REPEAT
 
         REM Regular PlotIcon
         SYS "WimpPlotIcon_PlotIcon",,b%
-        REM SYS "Wimp_PlotIcon",,b%
+        REMSYS "Wimp_PlotIcon",,b%
         REM Declare the background colour to fade to:
         REMSYS "WimpPlotIcon_PlotIcon",,b%,&5441534B, %01, 0,0, &81397900
 
