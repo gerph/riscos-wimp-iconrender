@@ -16,6 +16,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
 wimp_config_t wimp_config = {
     true, // validation_c
     true, // multiline_alignment
@@ -126,6 +134,7 @@ static void get_icon_data(const Wimp_Icon *icon, const char **text, const char *
             *sprite_id = (void *)icon->data.sprite;
         }
     }
+    dprintf("get_icon_data: text=%llx validation=%llx sprite_id=%llx\n", *text, *validation, *sprite_id);
 }
 
 void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t *graphics, const Wimp_Icon *icon, int x, int y, colour_t bg_colour)
@@ -148,6 +157,7 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
     if (icon->flags & Wimp_IconDeleted) return;
 
     get_icon_data(icon, &text_str, &validation_str, &sprite_id, &sprite_area);
+    dprintf("ploticon_render: text_str=%llx, validation_str=%llx\n", text_str, validation_str);
 
     vc = validationcache_create(validation_str);
     border_type = vc ? vc->border_type : 0;
@@ -323,6 +333,7 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
     }
 
     /* FIXME: Push a clipping rectangle, not assert it */
+    dprintf("Clipping rectangle: %i,%i - %i,%i\n", bounds.x0, bounds.y0, bounds.x1, bounds.y1);
     gcontext->clip_rectangle(gcontext, (bbox_t*)&bounds);
     if (icon->flags & Wimp_IconText)
     {
@@ -345,6 +356,8 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
                 render_text = password_str;
             }
         }
+
+        dprintf("ploticon_render: (text alignment) text_str=%llx, validation_str=%llx, render_text=%llx\n", text_str, validation_str, render_text);
 
         align = get_text_alignment(icon->flags);
         textrender_setcolours(trender, colours[COLOUR_BG], colours[COLOUR_FG]);
@@ -370,6 +383,8 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
             {
                 const char *split = textrender_stringwidthwithsplit(trender, p, -1, icon_text_width, 32);
                 int len, display_len;
+
+                dprintf("Multi-line text: string is '%.*s'\n", split-p, p);
 
                 if (split == p && *p >= ' ') split = p + 1;
 
@@ -418,12 +433,14 @@ void ploticon_render(gcontext_t *gcontext, textrender_t *trender, wimpgraphics_t
                 if (align.halign == 0) row_tx = tx + (tw - rows[row_idx].width) / 2;
                 else if (align.halign == 1) row_tx = tx + (tw - rows[row_idx].width);
 
+                dprintf("ploticon_render: paint text = '%.*s'\n", rows[row_idx].len, rows[row_idx].text);
                 textrender_paint(trender, rows[row_idx].text, rows[row_idx].len, row_tx, ty + 8);
                 ty += row_height;
             }
         }
         else
         {
+            dprintf("ploticon_render: (stringwidth) render_text=%llx\n", render_text);
             tw = textrender_stringwidth(trender, render_text, -1);
             th = 32; // Assuming system font height
 

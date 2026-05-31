@@ -65,7 +65,7 @@ jobs:
 
       - name: Obtain the GContext library
         run: |
-          curl -s -L -o libgcontext.zip https://github.com/gerph/riscos-gcontext/releases/download/v0.05/GContext-0.05.zip
+          curl -s -L -o libgcontext.zip https://github.com/gerph/riscos-gcontext/releases/download/v0.06/GContext-0.06.zip
           python3 -m rozipfile --verbose --extract libgcontext.zip
           rm libgcontext.zip
           # We now have Lib/GContext with h and o directories in

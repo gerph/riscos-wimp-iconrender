@@ -963,7 +963,7 @@ typedef uint32_t Wimp_MenuFlags;
 
 typedef uint32_t Wimp_IconFlags;
 
-typedef void * OSSpriteOp_Id;
+typedef uint32_t OSSpriteOp_Id;
 
 struct OSSpriteOp_Area_s {
     int32_t size;
@@ -978,18 +978,18 @@ typedef union Wimp_IconData_u {
     uint8_t sprite[Wimp_IconNameLimit];
     uint8_t text_and_sprite[Wimp_IconNameLimit];
     struct {
-        char * text;
-        char * validation;
+        uint32_t text;
+        uint32_t validation;
         int32_t size;
     } indirected_text;
     struct {
         OSSpriteOp_Id id;
-        OSSpriteOp_Area * area;
+        uint32_t area;
         int32_t size;
     } indirected_sprite;
     struct {
-        char * text;
-        char * validation;
+        uint32_t text;
+        uint32_t validation;
         int32_t size;
     } indirected_text_and_sprite;
 } Wimp_IconData;
@@ -1008,7 +1008,7 @@ struct Wimp_Menu_s {
     union {
         uint8_t text[Wimp_MenuNameLimit];
         struct {
-            char * text;
+            uint32_t text;
             uint8_t reserved[8];
         } indirected_text;
     } title_data;
